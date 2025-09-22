@@ -120,6 +120,8 @@
 .prompt-actions {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
   margin-top: 16px;
 }
 
@@ -148,6 +150,24 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+.clear-prompt-button {
+  background: #f97316;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.9em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-prompt-button:hover {
+  background: #ea580c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
 }
 
 /* Right Panel */
@@ -357,6 +377,47 @@
 
 .undo-button:hover {
   background: #e6850e;
+  transform: translateY(-1px);
+}
+
+.download-generated-button {
+  background: #f97316;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.download-generated-button:hover {
+  background: #ea580c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+.start-over-button {
+  background: #8e8e93;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.start-over-button:hover {
+  background: #6d6d7a;
   transform: translateY(-1px);
 }
 

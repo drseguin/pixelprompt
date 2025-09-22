@@ -308,6 +308,41 @@ app.post('/api/session/:sessionId/new-upload', (req, res) => {
   }
 });
 
+// Download endpoint
+app.get('/api/download/:sessionId/:filename', (req, res) => {
+  try {
+    const { sessionId, filename } = req.params;
+
+    if (!uploadSessions.has(sessionId)) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    const session = uploadSessions.get(sessionId);
+    const file = session.uploadedFiles.find(f => f.filename === filename);
+
+    if (!file) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    const filePath = path.join('uploads', file.uploadFolder, filename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File not found on disk' });
+    }
+
+    // Set headers for download
+    res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`);
+    res.setHeader('Content-Type', file.mimetype);
+
+    // Send the file
+    res.sendFile(path.resolve(filePath));
+
+  } catch (error) {
+    console.error('Download error:', error);
+    res.status(500).json({ error: 'Download failed' });
+  }
+});
+
 // Settings endpoint
 app.get('/api/settings', (req, res) => {
   try {

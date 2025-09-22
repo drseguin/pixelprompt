@@ -210,6 +210,33 @@ function App() {
     setImageHistory([]);
   };
 
+  /**
+   * Clear the prompt text area
+   */
+  const handleClearPrompt = () => {
+    setPromptText('');
+  };
+
+  /**
+   * Download the generated image
+   */
+  const handleDownloadGenerated = () => {
+    if (!generatedImage) return;
+
+    // Create a filename based on the prompt and timestamp
+    const timestamp = new Date(generatedImage.timestamp).toISOString().replace(/[:.]/g, '-');
+    const promptSnippet = generatedImage.prompt.slice(0, 30).replace(/[^a-zA-Z0-9]/g, '_');
+    const filename = `generated_${promptSnippet}_${timestamp}.png`;
+
+    // Create a temporary anchor element to trigger download
+    const link = document.createElement('a');
+    link.href = generatedImage.url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
   return (
     <div className="app">
@@ -282,6 +309,16 @@ function App() {
                       : (uploadedFiles.length > 0 ? 'Edit Image' : 'Generate Image')
                   }
                 </button>
+                {promptText.trim() && (
+                  <button
+                    className="clear-prompt-button"
+                    onClick={handleClearPrompt}
+                    type="button"
+                    title="Clear prompt"
+                  >
+                    Clear
+                  </button>
+                )}
               </div>
             </section>
           </div>
@@ -293,6 +330,14 @@ function App() {
                 <div className="generated-image-header">
                   <h3>Generated Image</h3>
                   <div className="image-actions">
+                    <button
+                      className="download-generated-button"
+                      onClick={handleDownloadGenerated}
+                      type="button"
+                      title="Download generated image"
+                    >
+                      ⬇️ Download
+                    </button>
                     {(imageHistory.length > 0 || generatedImage) && (
                       <button
                         className="undo-button"

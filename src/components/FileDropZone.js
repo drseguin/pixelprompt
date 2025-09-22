@@ -75,6 +75,8 @@ const FileDropZone = ({ onFilesUploaded }) => {
           file: { name: file.originalName, type: file.mimetype },
           url: `/uploads/${file.uploadFolder}/${file.filename}`,
           name: file.originalName,
+          filename: file.filename,
+          originalName: file.originalName,
           isExisting: true
         });
       }
@@ -142,10 +144,13 @@ const FileDropZone = ({ onFilesUploaded }) => {
           newThumbnails.push({
             file: file,
             url: e.target.result,
-            name: file.name
+            name: file.name,
+            filename: null, // Will be updated after upload
+            originalName: file.name,
+            isNewUpload: true
           });
 
-          if (newThumbnails.length === files.length) {
+          if (newThumbnails.length === files.filter(f => f.type.startsWith('image/')).length) {
             setThumbnails(prev => [...prev, ...newThumbnails]);
           }
         };
@@ -188,6 +193,24 @@ const FileDropZone = ({ onFilesUploaded }) => {
         if (result.uploadFolder && result.uploadFolder !== currentFolder) {
           setCurrentFolder(result.uploadFolder);
         }
+
+        // Update thumbnails to include filename for download
+        setThumbnails(prev => {
+          const updatedThumbnails = [...prev];
+          const imageFiles = files.filter(f => f.type.startsWith('image/'));
+          result.files.forEach((file, index) => {
+            // Find the corresponding thumbnail for this uploaded file
+            const thumbnailIndex = updatedThumbnails.findIndex(thumb =>
+              thumb.isNewUpload && !thumb.filename && thumb.name === file.originalName
+            );
+            if (thumbnailIndex !== -1) {
+              updatedThumbnails[thumbnailIndex].filename = file.filename;
+              updatedThumbnails[thumbnailIndex].originalName = file.originalName;
+              updatedThumbnails[thumbnailIndex].isNewUpload = false;
+            }
+          });
+          return updatedThumbnails;
+        });
 
         setUploadedFiles(prev => [...prev, ...result.files]);
         onFilesUploaded?.(result.files);
@@ -243,6 +266,58 @@ const FileDropZone = ({ onFilesUploaded }) => {
   };
 
   /**
+   * Downloads a specific file
+   * @param {string} filename - The filename on the server
+   * @param {string} originalName - The original file name for download
+   */
+  const downloadFile = (filename, originalName) => {
+    if (!filename) {
+      console.error('Cannot download: filename not available');
+      return;
+    }
+
+    const downloadUrl = `/api/download/${sessionId}/${filename}`;
+
+    // Create a temporary anchor element to trigger download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = originalName || filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  /**
+   * Removes a single image from the thumbnails and uploaded files
+   * @param {number} index - Index of the thumbnail to remove
+   */
+  const removeImage = async (index) => {
+    const thumbnail = thumbnails[index];
+
+    // Remove from thumbnails immediately for UI responsiveness
+    setThumbnails(prev => prev.filter((_, i) => i !== index));
+
+    // If it's an uploaded file, also remove from server
+    if (thumbnail.filename) {
+      try {
+        // Remove from local uploaded files state
+        setUploadedFiles(prev => prev.filter(file => file.filename !== thumbnail.filename));
+
+        // Note: We could add a server endpoint to delete individual files if needed
+        console.log(`Removed image: ${thumbnail.originalName}`);
+      } catch (error) {
+        console.error('Error removing image:', error);
+        // Re-add the thumbnail if server removal fails
+        setThumbnails(prev => {
+          const newThumbnails = [...prev];
+          newThumbnails.splice(index, 0, thumbnail);
+          return newThumbnails;
+        });
+      }
+    }
+  };
+
+  /**
    * Starts a new upload session (new folder)
    */
   const startNewUploadSession = async () => {
@@ -293,8 +368,34 @@ const FileDropZone = ({ onFilesUploaded }) => {
             <div className="thumbnails-grid">
               {thumbnails.map((thumbnail, index) => (
                 <div key={index} className="thumbnail-item">
+                  <button
+                    className="remove-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeImage(index);
+                    }}
+                    title="Remove image"
+                  >
+                    ✕
+                  </button>
                   <img src={thumbnail.url} alt={thumbnail.name} className="thumbnail-image" />
-                  <span className="thumbnail-name">{thumbnail.name}</span>
+                  <div className="thumbnail-info">
+                    <span className="thumbnail-name">{thumbnail.name}</span>
+                    <div className="thumbnail-actions">
+                      {thumbnail.filename && (
+                        <button
+                          className="download-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            downloadFile(thumbnail.filename, thumbnail.originalName);
+                          }}
+                          title="Download image"
+                        >
+                          ⬇️
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
               <div className="add-more-button">
