@@ -1,0 +1,262 @@
+/* Apple Minimalist Design for Pixel Prompt */
+
+.app {
+  min-height: 100vh;
+  background: #fafafa;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', sans-serif;
+  color: #1d1d1f;
+  line-height: 1.47;
+}
+
+/* Header Styles */
+.app-header {
+  background: #ffffff;
+  color: #1d1d1f;
+  padding: 24px 40px;
+  text-align: center;
+  border-bottom: 1px solid #e5e5e7;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.app-title {
+  margin: 0;
+  font-size: 2.2em;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.pixel-text {
+  color: #1d1d1f;
+}
+
+.prompt-text {
+  color: #6e6e73;
+  margin-left: 8px;
+}
+
+.app-subtitle {
+  margin: 8px 0 0 0;
+  font-size: 1.1em;
+  font-weight: 400;
+  color: #6e6e73;
+  letter-spacing: 0.01em;
+}
+
+/* Main Layout */
+.app-main {
+  padding: 32px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  min-height: calc(100vh - 200px);
+}
+
+/* Panel Styles */
+.left-panel, .right-panel {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.left-panel:hover, .right-panel:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Section Styles */
+.section-title {
+  color: #1d1d1f;
+  font-size: 1.3em;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  letter-spacing: -0.02em;
+}
+
+.upload-section {
+  margin-bottom: 32px;
+}
+
+/* Prompt Section */
+.prompt-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.prompt-textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid #e5e5e7;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 1em;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.2s ease;
+  background: #fafafa;
+  line-height: 1.5;
+}
+
+.prompt-textarea:focus {
+  outline: none;
+  border-color: #007aff;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.prompt-textarea::placeholder {
+  color: #8e8e93;
+  font-style: normal;
+}
+
+.prompt-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.generate-button {
+  background: #007aff;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: -0.01em;
+}
+
+.generate-button:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.generate-button:disabled {
+  background: #e5e5e7;
+  color: #8e8e93;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Right Panel */
+.empty-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 400px;
+}
+
+.empty-panel-content {
+  text-align: center;
+  color: #8e8e93;
+}
+
+.empty-icon {
+  font-size: 3em;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-panel-content h3 {
+  color: #6e6e73;
+  margin: 0 0 8px 0;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.empty-panel-content p {
+  margin: 0;
+  color: #8e8e93;
+  font-size: 0.95em;
+}
+
+/* Footer */
+.app-footer {
+  background: #f5f5f7;
+  border-top: 1px solid #e5e5e7;
+  padding: 16px 40px;
+  text-align: center;
+  color: #8e8e93;
+  font-size: 0.9em;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .app-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .app-main {
+    padding: 24px 20px;
+  }
+
+  .left-panel, .right-panel {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 20px 20px;
+  }
+
+  .app-title {
+    font-size: 1.8em;
+  }
+
+  .app-subtitle {
+    font-size: 1em;
+  }
+
+  .prompt-actions {
+    justify-content: center;
+  }
+
+  .generate-button {
+    width: 100%;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Focus indicators for accessibility */
+button:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 2px;
+}
+
+/* Subtle animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.left-panel,
+.right-panel {
+  animation: fadeIn 0.5s ease;
+}

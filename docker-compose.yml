@@ -1,0 +1,34 @@
+services:
+  pixelprompt:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pixelprompt-app
+    ports:
+      - "3001:3001"
+    volumes:
+      # Persistent uploads directory
+      - ./uploads:/app/uploads
+      # Persistent config directory
+      - ./config:/app/config
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    restart: unless-stopped
+    networks:
+      - pixelprompt-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  pixelprompt-network:
+    driver: bridge
+
+volumes:
+  pixelprompt-uploads:
+    driver: local
+  pixelprompt-config:
+    driver: local
