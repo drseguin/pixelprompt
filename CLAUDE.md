@@ -4,32 +4,85 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **pixelprompt**, a Real-Time Translation application codebase featuring:
-- Real-time audio processing with low-latency requirements (<10ms)
-- LLM integration for translation services
-- Secure, air-gapped environment support
-- Professional-grade UI following Apple design system
-- Comprehensive configuration management
-- Enterprise deployment capabilities
+This is **pixelprompt**, a React application for testing Google's Nano Banana with file upload and prompt functionality featuring:
+- Drag & drop file upload with timestamped organization
+- Express.js backend with multer for file handling
+- Session-based file management with browser localStorage
+- Two-panel UI layout with orange theme
+- Docker containerization for easy deployment
+- Sequential file naming and thumbnail generation
 
 ## Architecture
 
 ### Core Structure
 ```
-src/
-├── assets/          # Static assets and resources
-├── components/      # React components with professional UI
-config/              # Configuration files (currently empty)
-public/              # Public assets
-uploads/             # File upload handling
+pixelprompt/
+├── src/
+│   ├── components/         # React components
+│   │   ├── FileDropZone.js # Main upload component with drag-drop
+│   │   └── FileDropZone.css
+│   ├── utils/
+│   │   └── session.js      # Browser session management
+│   ├── App.js              # Main application component
+│   ├── App.css             # Application styles
+│   ├── index.js            # React entry point
+│   └── index.css           # Global styles
+├── config/
+│   └── settings.json       # Application configuration
+├── uploads/                # File upload directory (timestamped folders)
+├── public/                 # Static assets
+├── server.js               # Express backend server
+├── package.json            # Dependencies and scripts
+└── Docker files + shell scripts
 ```
 
 ### Key Architectural Patterns
-- **Real-time Processing**: Audio processing components optimized for minimal latency
-- **LLM Provider Integration**: Modular design supporting multiple translation providers
-- **Security-First**: Encryption, authentication, and air-gapped environment considerations
-- **Configuration-Driven**: Centralized configuration with schema validation
-- **Professional UI**: Apple design system compliance with accessibility features
+- **Session-Based Organization**: Each browser session gets unique timestamped upload folders
+- **Client-Server Separation**: React frontend + Express backend with REST API
+- **File Management**: Multer handles uploads, files renamed sequentially (image_1, image_2, etc.)
+- **Timestamped Storage**: Files organized in "YYYY-MM-DD HH:MM:SS:SSS" Zulu time folders
+- **Session Persistence**: Browser localStorage maintains session across page reloads
+
+## Common Development Commands
+
+### Docker-based Development (Recommended)
+```bash
+# Start application (builds and runs containers)
+./start.sh
+
+# View real-time logs
+./stlog.sh
+
+# Stop application
+./stop.sh
+```
+
+### Local Development
+```bash
+# Install dependencies
+npm install
+
+# Start React development server (frontend only)
+npm start
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
+
+# Start backend server separately (port 3001)
+node server.js
+```
+
+### Docker Commands
+```bash
+# Manual Docker operations
+docker compose up -d --build
+docker compose logs -f
+docker compose down
+docker compose down -v  # Remove uploaded files
+```
 
 ## Development Rules (MANDATORY)
 
@@ -45,72 +98,93 @@ uploads/             # File upload handling
 2. **Function Documentation**: All exported functions and complex internal functions require JSDoc with:
    - Parameter validation rules
    - Return types and error conditions
-   - Examples and performance notes
-   - Security implications
+   - Examples and security implications
 
-3. **Configuration Management**: When modifying configuration:
-   - Update both `config/defaults.json` and `config/rtt_config.json`
-   - Update help content in `src/data/helpContent.js`
-   - Ensure proper UI integration with 'Apply' and 'Restore Defaults' functionality
-   - Update validation schemas
+3. **Configuration Management**: When modifying `config/settings.json`:
+   - Ensure backend server handles new configuration options
+   - Update UI components that reference config values
+   - Document security implications for new settings
 
-## Configuration Files
+## Configuration
 
-**Important**: No package.json found - this appears to be an early-stage project or may use alternative dependency management.
+### Main Configuration File: `config/settings.json`
+Key configuration areas:
+- **Upload Settings**: File types, size limits, max files, naming patterns
+- **UI Theme**: Orange color scheme, layout dimensions
+- **Security**: File validation, sanitization, upload rate limiting
+- **Development**: Port, logging, CORS settings
 
-### Key Configuration Areas
-- **Real-time Audio**: Buffer sizes, VAD sensitivity, latency optimization
-- **LLM Integration**: Provider configurations, API keys, fallback mechanisms
-- **Security**: Encryption settings, authentication, air-gapped environment
-- **UI/UX**: Accessibility settings, Apple design system compliance
+### Session Management
+- Browser sessions use cryptographically secure UUIDs
+- Session data stored in localStorage with prefixed keys
+- Server tracks active upload sessions per session ID
+- Each session gets unique timestamped upload folder
 
-## Documentation Requirements
+## API Endpoints
 
-### Help Content Updates
-When modifying UI components, update:
-- `src/data/helpContent.js` - Main help repository
-- Component-specific help props and tooltips
-- Settings descriptions with technical and user-friendly explanations
+```bash
+# File Operations
+POST /api/upload              # Upload files to session folder
+GET  /api/settings            # Get application settings
+POST /api/settings            # Update application settings
 
-### Security Documentation
-Document security implications for:
-- API key management
-- Encryption/decryption
-- Audio data handling
-- Network communications
-- User input validation
+# Session Management
+GET  /api/session/{sessionId}            # Get session data
+POST /api/session/{sessionId}/new-upload # Start new upload session
+POST /api/session/{sessionId}/clear      # Clear session and files
+```
 
-## Quality Standards
+## File Upload Process
 
-### Pre-Commit Checklist
-- [ ] File headers updated with current, accurate information
-- [ ] Function documentation complete for new/modified functions
-- [ ] Help content updated for UI changes
-- [ ] Configuration consistency across all related files
-- [ ] Error handling documented with user guidance
-- [ ] Security review complete
-- [ ] Performance impact assessed for real-time components
+1. **Frontend**: User drops/selects files in FileDropZone component
+2. **Session Check**: Get or create browser session ID (localStorage)
+3. **Upload**: POST to `/api/upload` with session headers
+4. **Server Processing**:
+   - Create timestamped folder if needed
+   - Rename files sequentially (image_1.jpg, image_2.png, etc.)
+   - Store file metadata in session map
+5. **Response**: Return file metadata and folder info
+6. **UI Update**: Display thumbnails and file info
 
-### Code Quality
-- Professional-grade documentation suitable for enterprise deployment
-- Clear, actionable user guidance for all features
-- Comprehensive error handling with user-friendly messages
-- Consistent architectural patterns
-- Proper resource management for real-time processing
+## Key Components
 
-## Specialized Considerations
+### FileDropZone (`src/components/FileDropZone.js`)
+- Handles drag-and-drop and click-to-upload
+- Generates thumbnails for image files
+- Manages session-based file organization
+- Integrates with session management utilities
 
-### Real-Time Audio Processing
-- Document latency requirements and optimizations
-- Note memory allocation patterns and buffer considerations
-- Include VAD sensitivity implications
+### Session Management (`src/utils/session.js`)
+- Browser session ID generation and persistence
+- Session-specific data storage in localStorage
+- Upload session state management
 
-### LLM Integration
-- Document provider-specific behaviors and fallback mechanisms
-- Note rate limiting and caching strategies
+### Express Server (`server.js`)
+- Multer configuration for file uploads
+- Timestamped folder creation
+- Session-based file organization
+- Settings API endpoints
 
-### Enterprise Deployment
-- Air-gapped environment considerations
-- Compliance requirements
-- Professional presentation context
-- Security and data protection measures
+## Security Considerations
+
+- File type validation on frontend and backend
+- File size limitations to prevent abuse
+- Sanitized file naming to prevent path traversal
+- Session isolation between users
+- Input validation for all user data
+- No sensitive data stored in browser localStorage
+
+## Development Environment
+
+### Dependencies
+- **Frontend**: React 18, Create React App
+- **Backend**: Express.js, Multer, CORS
+- **Development**: Docker, Docker Compose
+
+### Browser Support
+- Chrome/Chromium 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+Application runs on `http://localhost:3001` when started via Docker.
