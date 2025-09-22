@@ -18,7 +18,8 @@
  * - Sanitized file naming conventions
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { getSessionId, getUploadSession, updateUploadSession } from '../utils/session';
 import './FileDropZone.css';
 
 const FileDropZone = ({ onFilesUploaded }) => {
@@ -26,7 +27,61 @@ const FileDropZone = ({ onFilesUploaded }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [thumbnails, setThumbnails] = useState([]);
+  const [currentFolder, setCurrentFolder] = useState(null);
   const fileInputRef = useRef(null);
+  const sessionId = getSessionId();
+
+  /**
+   * Load existing session data on component mount
+   */
+  useEffect(() => {
+    const loadSessionData = async () => {
+      try {
+        const response = await fetch(`/api/session/${sessionId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.session) {
+            setCurrentFolder(data.session.currentFolder);
+            setUploadedFiles(data.session.uploadedFiles);
+
+            // Load thumbnails for existing files if they're images
+            if (data.session.uploadedFiles.length > 0) {
+              loadExistingThumbnails(data.session.uploadedFiles);
+            }
+          } else {
+            // No existing session, create one automatically
+            await startNewUploadSession();
+          }
+        }
+      } catch (error) {
+        console.error('Error loading session data:', error);
+      }
+    };
+
+    loadSessionData();
+  }, [sessionId]);
+
+  /**
+   * Load thumbnails for existing uploaded files
+   * @param {Array} files - Array of uploaded file objects
+   */
+  const loadExistingThumbnails = (files) => {
+    const imageThumbnails = [];
+
+    files.forEach((file) => {
+      if (file.mimetype.startsWith('image/')) {
+        // Create a placeholder thumbnail - in a real app, you might serve the actual image
+        imageThumbnails.push({
+          file: { name: file.originalName, type: file.mimetype },
+          url: `/uploads/${file.uploadFolder}/${file.filename}`,
+          name: file.originalName,
+          isExisting: true
+        });
+      }
+    });
+
+    setThumbnails(imageThumbnails);
+  };
 
   /**
    * Handles drag over events for the drop zone
@@ -100,7 +155,7 @@ const FileDropZone = ({ onFilesUploaded }) => {
   };
 
   /**
-   * Uploads files to the server with timestamped organization
+   * Uploads files to the server with session-based organization
    * @param {File[]} files - Array of files to upload
    */
   const uploadFiles = async (files) => {
@@ -119,13 +174,25 @@ const FileDropZone = ({ onFilesUploaded }) => {
 
       const response = await fetch('/api/upload', {
         method: 'POST',
+        headers: {
+          'X-Session-ID': sessionId,
+          'X-Upload-Folder': currentFolder
+        },
         body: formData,
       });
 
       if (response.ok) {
         const result = await response.json();
+
+        // Update current folder if it was set by the server
+        if (result.uploadFolder && result.uploadFolder !== currentFolder) {
+          setCurrentFolder(result.uploadFolder);
+        }
+
         setUploadedFiles(prev => [...prev, ...result.files]);
         onFilesUploaded?.(result.files);
+
+        console.log(`Upload successful: ${result.files.length} files to folder ${result.uploadFolder}`);
       } else {
         throw new Error('Upload failed');
       }
@@ -140,9 +207,62 @@ const FileDropZone = ({ onFilesUploaded }) => {
   /**
    * Clears all uploaded files and thumbnails
    */
-  const clearFiles = () => {
-    setUploadedFiles([]);
-    setThumbnails([]);
+  const clearFiles = async () => {
+    try {
+      // Clear session on server (this deletes files and folder)
+      const clearResponse = await fetch(`/api/session/${sessionId}/clear`, {
+        method: 'POST'
+      });
+
+      if (clearResponse.ok) {
+        console.log('Session and files cleared successfully');
+      }
+
+      // Clear local state
+      setUploadedFiles([]);
+      setThumbnails([]);
+      setCurrentFolder(null);
+
+      // Immediately create a new session for future uploads
+      await startNewUploadSession();
+
+    } catch (error) {
+      console.error('Error clearing session:', error);
+      // Still clear local state even if server request fails
+      setUploadedFiles([]);
+      setThumbnails([]);
+      setCurrentFolder(null);
+
+      // Try to create new session even if clear failed
+      try {
+        await startNewUploadSession();
+      } catch (newSessionError) {
+        console.error('Error creating new session:', newSessionError);
+      }
+    }
+  };
+
+  /**
+   * Starts a new upload session (new folder)
+   */
+  const startNewUploadSession = async () => {
+    try {
+      const response = await fetch(`/api/session/${sessionId}/new-upload`, {
+        method: 'POST'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setCurrentFolder(result.session.currentFolder);
+        setUploadedFiles([]);
+        setThumbnails([]);
+
+        console.log(`New upload session started: ${result.session.currentFolder}`);
+        return result.session.currentFolder;
+      }
+    } catch (error) {
+      console.error('Error starting new upload session:', error);
+    }
   };
 
   return (

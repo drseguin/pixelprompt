@@ -34,6 +34,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('build'));
 
+// Store active upload sessions per session ID
+const uploadSessions = new Map();
+
 /**
  * Generates a timestamp folder name in Zulu time format
  * @returns {string} Formatted timestamp (YYYY-MM-DD HH:MM:SS:SSS)
@@ -52,6 +55,48 @@ const generateTimestampFolder = () => {
 };
 
 /**
+ * Gets or creates an upload session for a given session ID
+ * @param {string} sessionId - Browser session identifier
+ * @param {string} requestedFolder - Optional specific folder name
+ * @returns {object} Upload session data
+ */
+const getUploadSession = (sessionId, requestedFolder = null) => {
+  if (!uploadSessions.has(sessionId)) {
+    const timestampFolder = requestedFolder || generateTimestampFolder();
+    uploadSessions.set(sessionId, {
+      currentFolder: timestampFolder,
+      uploadedFiles: [],
+      createdAt: new Date().toISOString(),
+      lastActivity: new Date().toISOString()
+    });
+  }
+
+  // Update last activity
+  const session = uploadSessions.get(sessionId);
+  session.lastActivity = new Date().toISOString();
+
+  return session;
+};
+
+/**
+ * Cleans up old upload sessions (older than 24 hours)
+ */
+const cleanupOldSessions = () => {
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  for (const [sessionId, session] of uploadSessions.entries()) {
+    const lastActivity = new Date(session.lastActivity);
+    if (lastActivity < oneDayAgo) {
+      uploadSessions.delete(sessionId);
+      console.log(`Cleaned up old session: ${sessionId}`);
+    }
+  }
+};
+
+// Clean up old sessions every hour
+setInterval(cleanupOldSessions, 60 * 60 * 1000);
+
+/**
  * Ensures upload directory exists
  * @param {string} dirPath - Directory path to create
  */
@@ -64,21 +109,34 @@ const ensureDirectoryExists = (dirPath) => {
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const timestampFolder = generateTimestampFolder();
-    const uploadPath = path.join('uploads', timestampFolder);
+    const sessionId = req.headers['x-session-id'] || 'default';
+    const requestedFolder = req.headers['x-upload-folder'];
+
+    // Get or create upload session for this browser session
+    const uploadSession = getUploadSession(sessionId, requestedFolder);
+    const uploadPath = path.join('uploads', uploadSession.currentFolder);
 
     ensureDirectoryExists(uploadPath);
 
-    // Store the upload path in request for later use
+    // Store session info in request for later use
     req.uploadPath = uploadPath;
-    req.timestampFolder = timestampFolder;
+    req.uploadSession = uploadSession;
+    req.sessionId = sessionId;
 
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     // Get existing files in the directory to determine next number
     const uploadDir = req.uploadPath;
-    const existingFiles = fs.readdirSync(uploadDir);
+    let existingFiles = [];
+
+    try {
+      existingFiles = fs.readdirSync(uploadDir);
+    } catch (error) {
+      // Directory might not exist yet
+      existingFiles = [];
+    }
+
     const imageFiles = existingFiles.filter(f => f.startsWith('image_'));
     const nextNumber = imageFiles.length + 1;
 
@@ -122,21 +180,131 @@ app.post('/api/upload', upload.array('files'), (req, res) => {
       path: file.path,
       size: file.size,
       mimetype: file.mimetype,
-      uploadFolder: req.timestampFolder
+      uploadFolder: req.uploadSession.currentFolder,
+      sessionId: req.sessionId
     }));
 
-    console.log(`Uploaded ${uploadedFiles.length} files to ${req.timestampFolder}`);
+    // Update the session with new files
+    req.uploadSession.uploadedFiles.push(...uploadedFiles);
+    uploadSessions.set(req.sessionId, req.uploadSession);
+
+    console.log(`Session ${req.sessionId}: Uploaded ${uploadedFiles.length} files to ${req.uploadSession.currentFolder}`);
 
     res.json({
       success: true,
       message: `Successfully uploaded ${uploadedFiles.length} files`,
       files: uploadedFiles,
-      uploadFolder: req.timestampFolder
+      uploadFolder: req.uploadSession.currentFolder,
+      sessionId: req.sessionId,
+      totalFilesInSession: req.uploadSession.uploadedFiles.length
     });
 
   } catch (error) {
     console.error('Upload error:', error);
     res.status(500).json({ error: 'Upload failed', message: error.message });
+  }
+});
+
+// Session management endpoints
+app.get('/api/session/:sessionId', (req, res) => {
+  try {
+    const sessionId = req.params.sessionId;
+
+    if (uploadSessions.has(sessionId)) {
+      const session = uploadSessions.get(sessionId);
+      res.json({
+        success: true,
+        session: {
+          sessionId: sessionId,
+          currentFolder: session.currentFolder,
+          uploadedFiles: session.uploadedFiles,
+          createdAt: session.createdAt,
+          lastActivity: session.lastActivity,
+          totalFiles: session.uploadedFiles.length
+        }
+      });
+    } else {
+      res.json({
+        success: true,
+        session: null,
+        message: 'No active session found'
+      });
+    }
+  } catch (error) {
+    console.error('Session retrieval error:', error);
+    res.status(500).json({ error: 'Failed to retrieve session' });
+  }
+});
+
+app.post('/api/session/:sessionId/clear', (req, res) => {
+  try {
+    const sessionId = req.params.sessionId;
+
+    if (uploadSessions.has(sessionId)) {
+      const session = uploadSessions.get(sessionId);
+
+      // Delete the actual files and folder
+      if (session.currentFolder) {
+        const folderPath = path.join('uploads', session.currentFolder);
+
+        try {
+          if (fs.existsSync(folderPath)) {
+            // Remove all files in the folder
+            const files = fs.readdirSync(folderPath);
+            files.forEach(file => {
+              const filePath = path.join(folderPath, file);
+              fs.unlinkSync(filePath);
+            });
+
+            // Remove the folder itself
+            fs.rmdirSync(folderPath);
+            console.log(`Deleted folder: ${folderPath}`);
+          }
+        } catch (fileError) {
+          console.error('Error deleting files:', fileError);
+          // Continue with session clearing even if file deletion fails
+        }
+      }
+
+      uploadSessions.delete(sessionId);
+      console.log(`Cleared session: ${sessionId}`);
+    }
+
+    res.json({
+      success: true,
+      message: 'Session and files cleared successfully'
+    });
+  } catch (error) {
+    console.error('Session clear error:', error);
+    res.status(500).json({ error: 'Failed to clear session' });
+  }
+});
+
+app.post('/api/session/:sessionId/new-upload', (req, res) => {
+  try {
+    const sessionId = req.params.sessionId;
+
+    // Clear current session and create new upload folder
+    if (uploadSessions.has(sessionId)) {
+      uploadSessions.delete(sessionId);
+    }
+
+    // Create new session with new folder
+    const newSession = getUploadSession(sessionId);
+
+    res.json({
+      success: true,
+      session: {
+        sessionId: sessionId,
+        currentFolder: newSession.currentFolder,
+        uploadedFiles: [],
+        createdAt: newSession.createdAt
+      },
+      message: 'New upload session created'
+    });
+  } catch (error) {
+    console.error('New upload session error:', error);
+    res.status(500).json({ error: 'Failed to create new upload session' });
   }
 });
 
