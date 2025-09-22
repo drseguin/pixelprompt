@@ -127,13 +127,18 @@ function App() {
     try {
       let result;
 
-      if (uploadedFiles.length === 0) {
-        // Text-to-image generation
-        console.log('Generating image from text prompt');
-        result = await nanoBananaApi.generateImage(promptText);
-      } else {
+      // Priority: 1. Use current generated image, 2. Use uploaded files, 3. Generate from scratch
+      if (generatedImage) {
+        // Modify the current generated image
+        console.log('Modifying current generated image with prompt');
+
+        // Extract base64 data from the current generated image
+        const base64Data = generatedImage.url.split(',')[1]; // Remove data URL prefix
+        result = await nanoBananaApi.editImage([base64Data], promptText);
+
+      } else if (uploadedFiles.length > 0) {
         // Image editing with uploaded files
-        console.log('Editing images with prompt');
+        console.log('Editing uploaded images with prompt');
 
         // Convert uploaded files to base64
         const imageData = [];
@@ -151,6 +156,10 @@ function App() {
         }
 
         result = await nanoBananaApi.editImage(imageData, promptText);
+      } else {
+        // Text-to-image generation
+        console.log('Generating image from text prompt');
+        result = await nanoBananaApi.generateImage(promptText);
       }
 
       if (result) {
@@ -165,7 +174,8 @@ function App() {
           url: imageUrl,
           prompt: promptText,
           timestamp: new Date().toISOString(),
-          isFromUpload: uploadedFiles.length > 0
+          isFromUpload: uploadedFiles.length > 0 && !generatedImage,
+          isModification: !!generatedImage
         });
 
         console.log('Image generated successfully');
@@ -190,6 +200,14 @@ function App() {
     } else {
       setGeneratedImage(null);
     }
+  };
+
+  /**
+   * Clear generated image and start over
+   */
+  const handleStartOver = () => {
+    setGeneratedImage(null);
+    setImageHistory([]);
   };
 
 
@@ -257,7 +275,12 @@ function App() {
                   onClick={handleGenerate}
                   type="button"
                 >
-                  {isGenerating ? 'Generating...' : (uploadedFiles.length > 0 ? 'Edit Image' : 'Generate Image')}
+                  {isGenerating
+                    ? 'Generating...'
+                    : generatedImage
+                      ? 'Modify Image'
+                      : (uploadedFiles.length > 0 ? 'Edit Image' : 'Generate Image')
+                  }
                 </button>
               </div>
             </section>
@@ -279,6 +302,13 @@ function App() {
                         ↶ Undo
                       </button>
                     )}
+                    <button
+                      className="start-over-button"
+                      onClick={handleStartOver}
+                      type="button"
+                    >
+                      🔄 Start Over
+                    </button>
                   </div>
                 </div>
                 <div className="generated-image-wrapper">
@@ -296,6 +326,10 @@ function App() {
                   {generatedImage.isFromUpload && (
                     <p className="source-info">✨ Based on {uploadedFiles.length} uploaded image(s)</p>
                   )}
+                  {generatedImage.isModification && (
+                    <p className="source-info">🔄 Modified from previous image</p>
+                  )}
+                  <p className="next-prompt-info">💡 Next prompt will modify this image</p>
                 </div>
               </div>
             ) : (

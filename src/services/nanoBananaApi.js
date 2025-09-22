@@ -106,7 +106,7 @@ class NanoBananaApiService {
 
   /**
    * Edit an existing image with a text prompt
-   * @param {Array<{data: string, mimeType: string}>} images - Array of input images as base64
+   * @param {Array<string|{data: string, mimeType: string}>} images - Array of input images as base64 strings or objects
    * @param {string} prompt - Text description for image editing
    * @returns {Promise<{imageData: string, mimeType: string}>} Edited image data
    * @throws {Error} If editing fails or invalid inputs
@@ -136,14 +136,24 @@ class NanoBananaApiService {
 
       // Add images to content
       images.forEach((image, index) => {
-        if (!image.data || !image.mimeType) {
+        let imageData, mimeType;
+
+        if (typeof image === 'string') {
+          // Handle plain base64 string (from generated images)
+          imageData = image;
+          mimeType = 'image/png'; // Default MIME type for generated images
+        } else if (image && image.data && image.mimeType) {
+          // Handle image object with data and mimeType
+          imageData = image.data;
+          mimeType = image.mimeType;
+        } else {
           throw new Error(`Invalid image data at index ${index}`);
         }
 
         contents.push({
           inlineData: {
-            data: image.data,
-            mimeType: image.mimeType
+            data: imageData,
+            mimeType: mimeType
           }
         });
       });
