@@ -79,17 +79,63 @@ function App() {
    * Initialize Nano Banana API with API key
    * @param {string} apiKey - Google AI API key
    */
-  const initializeApi = useCallback((apiKey) => {
+  const initializeApi = useCallback(async (apiKey) => {
     try {
       nanoBananaApi.initialize(apiKey);
       setIsApiReady(true);
       console.log('Nano Banana API ready');
+
+      // Save the API key to backend settings for future use
+      await saveApiKeyToSettings(apiKey);
     } catch (error) {
       console.error('Failed to initialize API:', error);
       setIsApiReady(false);
       alert('Failed to initialize Nano Banana API. Please check your API key.');
     }
   }, []);
+
+  /**
+   * Save API key to backend settings
+   * @param {string} apiKey - The API key to save
+   */
+  const saveApiKeyToSettings = async (apiKey) => {
+    try {
+      // Get current settings
+      const response = await fetch('/api/settings');
+      let currentSettings = {};
+
+      if (response.ok) {
+        currentSettings = await response.json();
+      }
+
+      // Update the nanoBanana section with the new API key
+      const updatedSettings = {
+        ...currentSettings,
+        nanoBanana: {
+          ...currentSettings.nanoBanana,
+          apiKey: apiKey
+        }
+      };
+
+      // Save updated settings
+      const saveResponse = await fetch('/api/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedSettings),
+      });
+
+      if (saveResponse.ok) {
+        console.log('API key saved to settings');
+        setSettings(updatedSettings);
+      } else {
+        console.warn('Failed to save API key to settings');
+      }
+    } catch (error) {
+      console.error('Error saving API key:', error);
+    }
+  };
 
   /**
    * Handle API key input and initialization
@@ -102,9 +148,9 @@ function App() {
   /**
    * Save API key and initialize the service
    */
-  const handleApiKeySubmit = () => {
+  const handleApiKeySubmit = async () => {
     if (apiKeyInput.trim()) {
-      initializeApi(apiKeyInput.trim());
+      await initializeApi(apiKeyInput.trim());
     }
   };
 
@@ -137,25 +183,18 @@ function App() {
         result = await nanoBananaApi.editImage([base64Data], promptText);
 
       } else if (uploadedFiles.length > 0) {
-        // Image editing with uploaded files
-        console.log('Editing uploaded images with prompt');
+        // Image editing with the first uploaded file
+        console.log('Editing first uploaded image with prompt');
 
-        // Convert uploaded files to base64
-        const imageData = [];
-        for (const file of uploadedFiles) {
-          try {
-            const base64Data = await nanoBananaApi.urlToBase64(`/uploads/${file.uploadFolder}/${file.filename}`);
-            imageData.push(base64Data);
-          } catch (error) {
-            console.error('Failed to convert image:', error);
-          }
+        // Convert only the first uploaded file to base64
+        const firstFile = uploadedFiles[0];
+        try {
+          const base64Data = await nanoBananaApi.urlToBase64(`/uploads/${firstFile.uploadFolder}/${firstFile.filename}`);
+          result = await nanoBananaApi.editImage([base64Data], promptText);
+        } catch (error) {
+          console.error('Failed to convert first image:', error);
+          throw new Error('Could not process the first uploaded image');
         }
-
-        if (imageData.length === 0) {
-          throw new Error('No valid images could be processed');
-        }
-
-        result = await nanoBananaApi.editImage(imageData, promptText);
       } else {
         // Text-to-image generation
         console.log('Generating image from text prompt');
@@ -306,7 +345,7 @@ function App() {
                     ? 'Generating...'
                     : generatedImage
                       ? 'Modify Image'
-                      : (uploadedFiles.length > 0 ? 'Edit Image' : 'Generate Image')
+                      : (uploadedFiles.length > 0 ? 'Edit First Image' : 'Generate Image')
                   }
                 </button>
                 {promptText.trim() && (

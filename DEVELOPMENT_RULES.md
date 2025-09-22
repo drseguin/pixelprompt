@@ -243,6 +243,37 @@ Before committing any changes, verify:
 - Note Apple design system compliance
 - Include responsive design considerations
 - Update help tooltips and guidance
+- **MANDATORY**: Use only Google Material Icons for all UI icons
+
+### Icon Usage Standards
+**RULE: All UI icons must use Google Material Icons with standardized configuration**
+
+**Required Icon Source:**
+- **URL**: https://fonts.google.com/icons?selected=Material+Symbols+Outlined:sync:FILL@0;wght@400;GRAD@0;opsz@24&icon.size=24&icon.color=%23F19E39
+- **Style**: Material Symbols Outlined
+- **Configuration**: FILL@0;wght@400;GRAD@0;opsz@24
+- **Size**: 24px
+- **Color**: #F19E39 (Orange theme color)
+
+**Implementation Requirements:**
+- Use consistent icon sizing (24px)
+- Apply theme-appropriate colors (#F19E39 for primary actions)
+- Maintain accessibility standards with proper alt text
+- Include hover states and interactive feedback
+- Document icon choices in component headers
+
+**Icon Selection Guidelines:**
+- Choose semantically appropriate icons
+- Maintain visual consistency across the application
+- Test icons at different display densities
+- Ensure icons are recognizable at small sizes
+- Follow established icon metaphors (download = down arrow, remove = X, etc.)
+
+**Prohibited:**
+- Custom SVG icons without justification
+- Mixed icon libraries within the application
+- Inconsistent sizing or styling
+- Icons without accessibility considerations
 
 ## 🎯 QUALITY GATES
 
