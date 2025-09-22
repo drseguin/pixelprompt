@@ -19,14 +19,20 @@
  * - XSS prevention measures
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import FileDropZone from './components/FileDropZone';
+import nanoBananaApi from './services/nanoBananaApi';
 import './App.css';
 
 function App() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [promptText, setPromptText] = useState('');
-  const [settings, setSettings] = useState(null);
+  const [, setSettings] = useState(null);
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [imageHistory, setImageHistory] = useState([]);
+  const [apiKeyInput, setApiKeyInput] = useState('');
+  const [isApiReady, setIsApiReady] = useState(false);
 
   /**
    * Loads application settings from backend
@@ -38,6 +44,12 @@ function App() {
         if (response.ok) {
           const settingsData = await response.json();
           setSettings(settingsData);
+
+          // Check if API key is already configured
+          if (settingsData.nanoBanana?.apiKey) {
+            setApiKeyInput(settingsData.nanoBanana.apiKey);
+            initializeApi(settingsData.nanoBanana.apiKey);
+          }
         }
       } catch (error) {
         console.error('Failed to load settings:', error);
@@ -64,11 +76,122 @@ function App() {
   };
 
   /**
-   * Clears all uploaded files
+   * Initialize Nano Banana API with API key
+   * @param {string} apiKey - Google AI API key
    */
-  const clearFiles = () => {
-    setUploadedFiles([]);
+  const initializeApi = useCallback((apiKey) => {
+    try {
+      nanoBananaApi.initialize(apiKey);
+      setIsApiReady(true);
+      console.log('Nano Banana API ready');
+    } catch (error) {
+      console.error('Failed to initialize API:', error);
+      setIsApiReady(false);
+      alert('Failed to initialize Nano Banana API. Please check your API key.');
+    }
+  }, []);
+
+  /**
+   * Handle API key input and initialization
+   * @param {Event} e - Input change event
+   */
+  const handleApiKeyChange = (e) => {
+    setApiKeyInput(e.target.value);
   };
+
+  /**
+   * Save API key and initialize the service
+   */
+  const handleApiKeySubmit = () => {
+    if (apiKeyInput.trim()) {
+      initializeApi(apiKeyInput.trim());
+    }
+  };
+
+  /**
+   * Generate or edit image based on current state
+   */
+  const handleGenerate = async () => {
+    if (!isApiReady) {
+      alert('Please configure your API key first.');
+      return;
+    }
+
+    if (!promptText.trim()) {
+      alert('Please enter a prompt.');
+      return;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      let result;
+
+      if (uploadedFiles.length === 0) {
+        // Text-to-image generation
+        console.log('Generating image from text prompt');
+        result = await nanoBananaApi.generateImage(promptText);
+      } else {
+        // Image editing with uploaded files
+        console.log('Editing images with prompt');
+
+        // Convert uploaded files to base64
+        const imageData = [];
+        for (const file of uploadedFiles) {
+          try {
+            const base64Data = await nanoBananaApi.urlToBase64(`/uploads/${file.uploadFolder}/${file.filename}`);
+            imageData.push(base64Data);
+          } catch (error) {
+            console.error('Failed to convert image:', error);
+          }
+        }
+
+        if (imageData.length === 0) {
+          throw new Error('No valid images could be processed');
+        }
+
+        result = await nanoBananaApi.editImage(imageData, promptText);
+      }
+
+      if (result) {
+        // Save current image to history before updating
+        if (generatedImage) {
+          setImageHistory(prev => [...prev, generatedImage]);
+        }
+
+        // Create data URL for display
+        const imageUrl = `data:${result.mimeType};base64,${result.imageData}`;
+        setGeneratedImage({
+          url: imageUrl,
+          prompt: promptText,
+          timestamp: new Date().toISOString(),
+          isFromUpload: uploadedFiles.length > 0
+        });
+
+        console.log('Image generated successfully');
+      }
+
+    } catch (error) {
+      console.error('Generation failed:', error);
+      alert(`Failed to generate image: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  /**
+   * Undo last image generation
+   */
+  const handleUndo = () => {
+    if (imageHistory.length > 0) {
+      const previousImage = imageHistory[imageHistory.length - 1];
+      setGeneratedImage(previousImage);
+      setImageHistory(prev => prev.slice(0, -1));
+    } else {
+      setGeneratedImage(null);
+    }
+  };
+
 
   return (
     <div className="app">
@@ -98,27 +221,104 @@ function App() {
                 placeholder="Describe what you want to generate or edit..."
                 rows={3}
               />
+              {!isApiReady && (
+                <div className="api-key-section">
+                  <label htmlFor="api-key" className="api-key-label">
+                    Google AI API Key:
+                  </label>
+                  <div className="api-key-input-group">
+                    <input
+                      id="api-key"
+                      type="password"
+                      className="api-key-input"
+                      value={apiKeyInput}
+                      onChange={handleApiKeyChange}
+                      placeholder="Enter your Google AI API key"
+                    />
+                    <button
+                      className="api-key-submit"
+                      onClick={handleApiKeySubmit}
+                      disabled={!apiKeyInput.trim()}
+                      type="button"
+                    >
+                      Set Key
+                    </button>
+                  </div>
+                  <p className="api-key-help">
+                    Get your API key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
+                  </p>
+                </div>
+              )}
+
               <div className="prompt-actions">
                 <button
                   className="generate-button"
-                  disabled={!promptText.trim()}
+                  disabled={!promptText.trim() || !isApiReady || isGenerating}
+                  onClick={handleGenerate}
                   type="button"
                 >
-                  Generate
+                  {isGenerating ? 'Generating...' : (uploadedFiles.length > 0 ? 'Edit Image' : 'Generate Image')}
                 </button>
               </div>
             </section>
           </div>
 
-          {/* Right Panel - Reserved for future use */}
+          {/* Right Panel - Generated Image Display */}
           <div className="right-panel">
-            <div className="empty-panel">
-              <div className="empty-panel-content">
-                <div className="empty-icon">⚡</div>
-                <h3>Ready for Magic</h3>
-                <p>Generated content will appear here</p>
+            {generatedImage ? (
+              <div className="generated-image-container">
+                <div className="generated-image-header">
+                  <h3>Generated Image</h3>
+                  <div className="image-actions">
+                    {(imageHistory.length > 0 || generatedImage) && (
+                      <button
+                        className="undo-button"
+                        onClick={handleUndo}
+                        type="button"
+                      >
+                        ↶ Undo
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="generated-image-wrapper">
+                  <img
+                    src={generatedImage.url}
+                    alt="Generated content"
+                    className="generated-image"
+                  />
+                </div>
+                <div className="generated-image-info">
+                  <p className="prompt-used">Prompt: "{generatedImage.prompt}"</p>
+                  <p className="generation-time">
+                    Generated: {new Date(generatedImage.timestamp).toLocaleString()}
+                  </p>
+                  {generatedImage.isFromUpload && (
+                    <p className="source-info">✨ Based on {uploadedFiles.length} uploaded image(s)</p>
+                  )}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="empty-panel">
+                <div className="empty-panel-content">
+                  <div className="empty-icon">{isGenerating ? '⏳' : '⚡'}</div>
+                  <h3>{isGenerating ? 'Generating...' : 'Ready for Magic'}</h3>
+                  <p>
+                    {isGenerating
+                      ? 'Creating your image...'
+                      : isApiReady
+                        ? 'Generated content will appear here'
+                        : 'Please configure your API key to get started'
+                    }
+                  </p>
+                  {isGenerating && (
+                    <div className="generating-spinner">
+                      <div className="spinner"></div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
