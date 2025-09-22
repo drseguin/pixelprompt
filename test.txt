@@ -1,0 +1,16 @@
+create a react application called Pixel Prompt that will later be used to test Google's Nano Banana. For now I just want a simple screen that allows the 
+  user to drop one or more files in a drop zone or if the zone is clicked the user can upload one or more files. When uploaded they shoudl be uploaded 
+  teporarily to a folder called 'uploads' and under uploads a time stamped folder with the format YYY-MM_DD HH:MM:SS:MM in zulu time. in that folder the 
+  files should be called image_1, image_2 etc.\
+  \
+  this drop zome should be located to the left of the screen. Save a panel to the right for the (later) generated or edited image. Below the multiple file 
+  drop zone include a text area and the title 'Prompt.\
+  \
+  Store all application settings in a file called 'settings.json' in a folder called 'config'.\
+  \
+  Make the app as appealling as posible with orange highlights.
+
+  The application should run in a docker container so create the necessary docker files.
+
+  Also, create a ./start.sh to start the app, ./stop.sh to stop the app and ./stlog.sh to view the logs.
+  
