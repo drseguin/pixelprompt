@@ -261,6 +261,14 @@ Before committing any changes, verify:
 - Consistent code style and architectural patterns
 - Proper resource management for real-time processing
 
+## 📚 EXTERNAL DOCUMENTATION REFERENCES
+
+### AI/ML Integration
+- **Gemini API Image Generation**: https://ai.google.dev/gemini-api/docs/image-generation
+  - Use for implementing image generation features
+  - Reference for API integration patterns
+  - Security considerations for AI service integration
+
 ---
 
 *This document is mandatory reading for all contributors. Failure to follow these rules will result in code review rejection and required rework.*
