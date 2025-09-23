@@ -444,27 +444,27 @@ function App() {
                   <div className="practice-item">
                     <span className="practice-number">1)</span>
                     <span className="practice-label">Subject</span>
-                    <span className="practice-example">- ex: A young woman with freckles</span>
+                    <span className="practice-example">- A young woman with freckles</span>
                   </div>
                   <div className="practice-item">
                     <span className="practice-number">2)</span>
                     <span className="practice-label">Action</span>
-                    <span className="practice-example">- ex: smiling thoughtfully, sitting on a sunlit window seat</span>
+                    <span className="practice-example">- smiling thoughtfully, sitting on a sunlit window seat</span>
                   </div>
                   <div className="practice-item">
                     <span className="practice-number">3)</span>
                     <span className="practice-label">Environment</span>
-                    <span className="practice-example">- ex: in a cozy cafe</span>
+                    <span className="practice-example">- in a cozy cafe</span>
                   </div>
                   <div className="practice-item">
                     <span className="practice-number">4)</span>
                     <span className="practice-label">Art Style</span>
-                    <span className="practice-example">- ex: shot on a Canon 5D Mark IV Camera</span>
+                    <span className="practice-example">- shot on a Canon 5D Mark IV Camera</span>
                   </div>
                   <div className="practice-item">
                     <span className="practice-number">5)</span>
                     <span className="practice-label">Lighting</span>
-                    <span className="practice-example">- ex: soft natural light, warm and inviting</span>
+                    <span className="practice-example">- soft natural light, warm and inviting</span>
                   </div>
                 </div>
 
