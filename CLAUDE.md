@@ -18,7 +18,8 @@ This is **pixelprompt**, a simplified React application for testing Google's Gem
 pixelprompt/
 ├── src/
 │   ├── services/
-│   │   └── nanoBananaApi.js     # Google Gemini API integration service
+│   │   ├── nanoBananaApi.js     # Google Gemini API integration service
+│   │   └── promptAnalyzer.js    # AI-powered prompt analysis service
 │   ├── utils/
 │   │   └── session.js           # Browser session utilities (minimal usage)
 │   ├── App.js                   # Main application component
@@ -114,6 +115,9 @@ docker compose down -v  # Remove any persistent data
 - **`generatedImage`**: Single state object containing current working image
 - **`imageHistory`**: Array of previous images for undo functionality
 - **`promptText`**: Current prompt input
+- **`savedPrompts`**: Array of saved prompts with metadata
+- **`promptMetadata`**: Structured metadata for current prompt (category, subject, action, environment, art style, lighting)
+- **`isApiReady`**: Boolean indicating API key configuration status
 - **No complex file/session management required**
 
 ## API Integration
@@ -140,6 +144,9 @@ nanoBananaApi.editImage([base64ImageData], promptText)
 
 // File conversion
 nanoBananaApi.fileToBase64(file)
+
+// Prompt analysis
+promptAnalyzer.analyzePrompt(promptText)
 ```
 
 ## Key Components
@@ -150,6 +157,8 @@ nanoBananaApi.fileToBase64(file)
 - Integration with Gemini API service
 - Undo/redo functionality for image history
 - Simple prompt-to-action workflow
+- Prompt library management with save/load functionality
+- API key configuration interface
 
 ### Nano Banana API Service (`src/services/nanoBananaApi.js`)
 - Google Gemini API client initialization and management
@@ -157,6 +166,12 @@ nanoBananaApi.fileToBase64(file)
 - Image editing with multimodal inputs (images + text)
 - Base64 conversion utilities for files and URLs
 - Error handling and response processing
+
+### Prompt Analyzer Service (`src/services/promptAnalyzer.js`)
+- AI-powered prompt analysis using Google Gemini API
+- Extracts structured metadata: Category, Subject, Action, Environment, Art Style, Lighting
+- Provides fallback metadata generation for edge cases
+- Integrates with existing nanoBananaApi service
 
 ### Minimal Backend (`server.js`)
 - Serves React build files
