@@ -131,10 +131,10 @@ class NanoBananaApiService {
     try {
       console.log(`Editing ${images.length} image(s) with prompt:`, prompt);
 
-      // Prepare content with images and prompt
-      const contents = [];
+      // Prepare content with images and prompt for multimodal input
+      const parts = [];
 
-      // Add images to content
+      // Add images to parts
       images.forEach((image, index) => {
         let imageData, mimeType;
 
@@ -150,7 +150,7 @@ class NanoBananaApiService {
           throw new Error(`Invalid image data at index ${index}`);
         }
 
-        contents.push({
+        parts.push({
           inlineData: {
             data: imageData,
             mimeType: mimeType
@@ -159,11 +159,15 @@ class NanoBananaApiService {
       });
 
       // Add text prompt
-      contents.push(prompt.trim());
+      parts.push({
+        text: prompt.trim()
+      });
 
       const response = await this.client.models.generateContent({
         model: 'gemini-2.5-flash-image-preview',
-        contents: contents,
+        contents: [{
+          parts: parts
+        }],
       });
 
       // Extract image data from response

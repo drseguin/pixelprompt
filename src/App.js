@@ -189,8 +189,12 @@ function App() {
         // Convert only the first uploaded file to base64
         const firstFile = uploadedFiles[0];
         try {
-          const base64Data = await nanoBananaApi.urlToBase64(`/uploads/${firstFile.uploadFolder}/${firstFile.filename}`);
-          result = await nanoBananaApi.editImage([base64Data], promptText);
+          const imageData = await nanoBananaApi.urlToBase64(`/uploads/${firstFile.uploadFolder}/${firstFile.filename}`);
+
+          // Format the prompt to be more explicit about editing the provided image
+          const editPrompt = `Modify this image: ${promptText}`;
+
+          result = await nanoBananaApi.editImage([imageData], editPrompt);
         } catch (error) {
           console.error('Failed to convert first image:', error);
           throw new Error('Could not process the first uploaded image');
