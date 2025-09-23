@@ -11,9 +11,8 @@ services:
       - ./uploads:/app/uploads
       # Persistent config directory
       - ./config:/app/config
-    environment:
-      - NODE_ENV=production
-      - PORT=3001
+    env_file:
+      - .env
     restart: unless-stopped
     networks:
       - pixelprompt-network

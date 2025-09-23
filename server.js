@@ -347,20 +347,77 @@ app.get('/api/download/:sessionId/:filename', (req, res) => {
 app.get('/api/settings', (req, res) => {
   try {
     const settingsPath = path.join('config', 'settings.json');
+    let settings = {};
 
     if (fs.existsSync(settingsPath)) {
-      const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
-      res.json(settings);
+      settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
     } else {
       // Return default settings if file doesn't exist
-      const defaultSettings = {
-        theme: 'orange',
-        maxFileSize: '10MB',
-        allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-        maxFiles: 20
+      settings = {
+        application: {
+          name: "Pixel Prompt",
+          version: "1.0.0",
+          description: "Spark Creativity, Pixel by Pixel"
+        },
+        upload: {
+          maxFileSize: "10MB",
+          allowedTypes: [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/gif",
+            "image/webp",
+            "image/svg+xml"
+          ],
+          maxFiles: 20
+        },
+        ui: {
+          theme: "orange",
+          primaryColor: "#ff6b35",
+          secondaryColor: "#e55a2b",
+          accentColor: "#fef9f7"
+        },
+        features: {
+          dragAndDrop: true,
+          clickToUpload: true,
+          multipleFiles: true,
+          previewImages: true,
+          promptTextArea: true,
+          generateButton: true
+        },
+        security: {
+          validateFileTypes: true,
+          sanitizeFileNames: true,
+          preventPathTraversal: true,
+          maxUploadRate: "100MB/hour"
+        },
+        development: {
+          port: 3001,
+          enableLogging: true,
+          enableCors: true,
+          serveStaticFiles: true
+        }
       };
-      res.json(defaultSettings);
     }
+
+    // Override nanoBanana settings with environment variables
+    settings.nanoBanana = {
+      apiKey: process.env.GEMINI_API_KEY || '',
+      model: "gemini-2.5-flash-image-preview",
+      maxImages: 3,
+      supportedFormats: [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif"
+      ],
+      rateLimit: {
+        requestsPerMinute: 10,
+        requestsPerHour: 100
+      }
+    };
+
+    res.json(settings);
   } catch (error) {
     console.error('Settings read error:', error);
     res.status(500).json({ error: 'Failed to read settings' });
