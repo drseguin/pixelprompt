@@ -511,6 +511,7 @@ function App() {
 
       <footer className="app-footer">
         <p>Pixel Prompt v1.0.0 | Ready for Google Nano Banana Testing</p>
+        <p>&copy; David Seguin Consulting Inc. 2025. Developed by David Seguin</p>
       </footer>
     </div>
   );
