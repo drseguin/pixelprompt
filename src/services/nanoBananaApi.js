@@ -271,6 +271,44 @@ class NanoBananaApiService {
   }
 
   /**
+   * Generate text using Gemini API (for prompt analysis)
+   * @param {string} prompt - Text prompt for analysis
+   * @returns {Promise<{text: string}>} Generated text response
+   * @throws {Error} If text generation fails
+   */
+  async generateText(prompt) {
+    if (!this.isReady()) {
+      throw new Error('Nano Banana API not initialized. Call initialize() first.');
+    }
+
+    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+      throw new Error('Valid prompt required for text generation');
+    }
+
+    try {
+      console.log('Generating text with prompt:', prompt.substring(0, 100) + '...');
+
+      const response = await this.client.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [{ text: prompt.trim() }],
+      });
+
+      if (!response?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        throw new Error('No text response received from API');
+      }
+
+      const text = response.candidates[0].content.parts[0].text;
+      console.log('Text generated successfully');
+
+      return { text };
+
+    } catch (error) {
+      console.error('Text generation failed:', error);
+      throw new Error(`Text generation failed: ${error.message}`);
+    }
+  }
+
+  /**
    * Convert image URL to base64 (for uploaded images from server)
    * @param {string} imageUrl - URL of the image to convert
    * @returns {Promise<{data: string, mimeType: string}>} Base64 encoded image data

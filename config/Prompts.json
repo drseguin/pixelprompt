@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1758667764248",
+    "name": "Mountain Landscape",
+    "prompt": "Majestic mountain range at golden hour, misty valleys below, dramatic clouds, shot with wide-angle lens, cinematic lighting",
+    "category": "Landscape",
+    "subject": "Mountain range",
+    "action": "Static scene",
+    "environment": "Mountain valley",
+    "artStyle": "Wide-angle photography",
+    "lighting": "Golden hour",
+    "createdAt": "2025-09-23T22:49:24.248Z"
+  },
+  {
+    "id": "1758667769547",
+    "name": "Cyberpunk City",
+    "prompt": "Futuristic neon-lit cityscape at night, flying cars, holographic advertisements, rain-soaked streets, cyberpunk aesthetic, dramatic lighting",
+    "category": "Sci-Fi",
+    "subject": "Futuristic city",
+    "action": "Urban nightlife",
+    "environment": "Cyberpunk city",
+    "artStyle": "Digital art style",
+    "lighting": "Neon lighting",
+    "createdAt": "2025-09-23T22:49:29.547Z"
+  },
+  {
+    "id": "1758667957565",
+    "name": "Women in Cafe",
+    "prompt": "A young woman with freckles smiling thoughtfully, sitting on a sunlit window seat in a cozy cafe, shot on a Canon 5D Mark IV Camera, soft natural light, warm and inviting",
+    "category": "Portrait",
+    "subject": "Young Woman with Freckles",
+    "action": "Smiling Thoughtfully, Sitting",
+    "environment": "Sunlit Window Seat in Cafe",
+    "artStyle": "Canon 5D Mark IV Camera Photography",
+    "lighting": "Soft Natural, Warm Inviting",
+    "createdAt": "2025-09-23T22:52:37.565Z"
+  },
+  {
+    "id": "1758668348212",
+    "name": "Generated 9/23/2025",
+    "prompt": "Uploaded: ivy lea.jpg → add well dressed people walking on the dock, drinking champagne, at the golden hour",
+    "category": "Landscape",
+    "subject": "Well dressed people",
+    "action": "Walking, drinking champagne",
+    "environment": "On the dock",
+    "artStyle": "Photorealistic style",
+    "lighting": "Golden hour",
+    "createdAt": "2025-09-23T22:59:08.212Z"
+  }
+]

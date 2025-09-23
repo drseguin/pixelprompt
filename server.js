@@ -381,6 +381,103 @@ app.post('/api/settings', (req, res) => {
   }
 });
 
+// Prompt library endpoints
+app.get('/api/prompts', (req, res) => {
+  try {
+    const promptsPath = path.join('config', 'Prompts.json');
+
+    if (fs.existsSync(promptsPath)) {
+      const prompts = JSON.parse(fs.readFileSync(promptsPath, 'utf8'));
+      res.json(prompts || []);
+    } else {
+      // Return empty array if file doesn't exist
+      res.json([]);
+    }
+  } catch (error) {
+    console.error('Prompts read error:', error);
+    res.status(500).json({ error: 'Failed to read prompts' });
+  }
+});
+
+app.post('/api/prompts', (req, res) => {
+  try {
+    const promptsPath = path.join('config', 'Prompts.json');
+    ensureDirectoryExists(path.dirname(promptsPath));
+
+    // Read existing prompts
+    let prompts = [];
+    if (fs.existsSync(promptsPath)) {
+      try {
+        prompts = JSON.parse(fs.readFileSync(promptsPath, 'utf8')) || [];
+      } catch (parseError) {
+        console.warn('Invalid prompts file, starting fresh:', parseError);
+        prompts = [];
+      }
+    }
+
+    // Validate required fields
+    const { name, prompt, category, subject, action, environment, artStyle, lighting } = req.body;
+    if (!name || !prompt) {
+      return res.status(400).json({ error: 'Name and prompt are required' });
+    }
+
+    // Add new prompt
+    const newPrompt = {
+      id: req.body.id || Date.now().toString(),
+      name: name.trim(),
+      prompt: prompt.trim(),
+      category: category || 'Other',
+      subject: subject || '',
+      action: action || '',
+      environment: environment || '',
+      artStyle: artStyle || '',
+      lighting: lighting || '',
+      createdAt: req.body.createdAt || new Date().toISOString()
+    };
+
+    prompts.push(newPrompt);
+
+    // Save updated prompts
+    fs.writeFileSync(promptsPath, JSON.stringify(prompts, null, 2));
+
+    console.log(`Saved new prompt: ${newPrompt.name} (${newPrompt.category})`);
+    res.json({ success: true, message: 'Prompt saved successfully', prompt: newPrompt });
+  } catch (error) {
+    console.error('Prompt save error:', error);
+    res.status(500).json({ error: 'Failed to save prompt' });
+  }
+});
+
+app.delete('/api/prompts/:id', (req, res) => {
+  try {
+    const promptsPath = path.join('config', 'Prompts.json');
+    const promptId = req.params.id;
+
+    if (!fs.existsSync(promptsPath)) {
+      return res.status(404).json({ error: 'No prompts found' });
+    }
+
+    let prompts = JSON.parse(fs.readFileSync(promptsPath, 'utf8')) || [];
+    const originalLength = prompts.length;
+
+    // Filter out the prompt with the given ID
+    prompts = prompts.filter(prompt => prompt.id !== promptId);
+
+    if (prompts.length === originalLength) {
+      return res.status(404).json({ error: 'Prompt not found' });
+    }
+
+    // Save updated prompts
+    fs.writeFileSync(promptsPath, JSON.stringify(prompts, null, 2));
+
+    console.log(`Deleted prompt with ID: ${promptId}`);
+    res.json({ success: true, message: 'Prompt deleted successfully' });
+  } catch (error) {
+    console.error('Prompt delete error:', error);
+    res.status(500).json({ error: 'Failed to delete prompt' });
+  }
+});
+
 // Serve React app for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
