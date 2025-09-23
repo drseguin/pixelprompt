@@ -84,8 +84,7 @@
 }
 
 .prompt-text {
-  color: #6e6e73;
-  margin-left: 8px;
+  color: #F19E39;
 }
 
 .app-subtitle {
@@ -99,35 +98,53 @@
 /* Main Layout */
 .app-main {
   padding: 32px 40px;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
-.app-main {
-  max-width: 800px;
-  margin: 0 auto;
+/* Two-Panel Layout */
+.app-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  min-height: 600px;
 }
 
-.prompt-section {
-  margin-bottom: 24px;
-}
-
-.image-section {
+.left-panel {
   background: #ffffff;
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e5e7;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Panel Styles */
 .right-panel {
-  width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e5e7;
+  display: flex;
+  flex-direction: column;
+}
+
+.prompt-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Section Styles */
 .section-title {
-  color: #1d1d1f;
+  color: #F19E39;
   font-size: 1.3em;
   font-weight: 600;
   margin: 0 0 20px 0;
@@ -139,14 +156,10 @@
 }
 
 /* Prompt Section */
-.prompt-section {
-  display: flex;
-  flex-direction: column;
-}
-
-.prompt-textarea {
+.prompt-section .prompt-textarea {
+  flex: 1;
   width: 100%;
-  min-height: 80px;
+  min-height: 200px;
   border: 1px solid #e5e5e7;
   border-radius: 12px;
   padding: 16px;
@@ -156,6 +169,7 @@
   transition: all 0.2s ease;
   background: #fafafa;
   line-height: 1.5;
+  margin-bottom: 16px;
 }
 
 .prompt-textarea:focus {

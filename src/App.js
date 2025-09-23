@@ -338,7 +338,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1 className="app-title">
-          <span className="pixel-text">Pixel</span>
+          <span className="pixel-text">Pixel </span>
           <span className="prompt-text">Prompt</span>
         </h1>
         <p className="app-subtitle">Google Nano Banana Testing Interface</p>
@@ -374,48 +374,52 @@ function App() {
           </div>
         )}
 
-        <div className="prompt-section">
-          <textarea
-            className="prompt-textarea"
-            value={promptText}
-            onChange={handlePromptChange}
-            placeholder={generatedImage
-              ? "Describe how to modify the current image..."
-              : "Describe what you want to generate..."}
-            rows={3}
-          />
+        <div className="app-layout">
+          <div className="left-panel">
+            <div className="prompt-section">
+              <h2 className="section-title">Prompt</h2>
+              <textarea
+                className="prompt-textarea"
+                value={promptText}
+                onChange={handlePromptChange}
+                placeholder={generatedImage
+                  ? "Describe how to modify the current image..."
+                  : "Describe what you want to generate..."}
+                rows={6}
+              />
 
-          <div className="prompt-actions">
-            <button
-              className="generate-button"
-              disabled={!promptText.trim() || !isApiReady || isGenerating}
-              onClick={handleGenerate}
-              type="button"
-            >
-              {isGenerating
-                ? 'Generating...'
-                : generatedImage
-                  ? 'Modify Image'
-                  : 'Generate Image'
-              }
-            </button>
-            {promptText.trim() && (
-              <button
-                className="clear-prompt-button"
-                onClick={handleClearPrompt}
-                type="button"
-                title="Clear prompt"
-              >
-                Clear
-              </button>
-            )}
+              <div className="prompt-actions">
+                <button
+                  className="generate-button"
+                  disabled={!promptText.trim() || !isApiReady || isGenerating}
+                  onClick={handleGenerate}
+                  type="button"
+                >
+                  {isGenerating
+                    ? 'Generating...'
+                    : generatedImage
+                      ? 'Modify Image'
+                      : 'Generate Image'
+                  }
+                </button>
+                {promptText.trim() && (
+                  <button
+                    className="clear-prompt-button"
+                    onClick={handleClearPrompt}
+                    type="button"
+                    title="Clear prompt"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="image-section">
-          {/* Image Display and Drop Zone */}
           <div className="right-panel">
-            {generatedImage ? (
+            <div className="image-section">
+              {/* Image Display and Drop Zone */}
+              {generatedImage ? (
               <div className="generated-image-container">
                 <div className="generated-image-header">
                   <h3>Generated Image</h3>
@@ -500,6 +504,7 @@ function App() {
                 </div>
               </div>
             )}
+            </div>
           </div>
         </div>
       </main>
