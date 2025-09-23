@@ -153,27 +153,6 @@
   white-space: nowrap;
 }
 
-.download-button {
-  background: #f97316;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 0.8em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 20px;
-}
-
-.download-button:hover {
-  background: #ea580c;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
 .remove-button {
   position: absolute;

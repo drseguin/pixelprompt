@@ -194,7 +194,7 @@ const FileDropZone = ({ onFilesUploaded }) => {
           setCurrentFolder(result.uploadFolder);
         }
 
-        // Update thumbnails to include filename for download
+        // Update thumbnails with server response data
         setThumbnails(prev => {
           const updatedThumbnails = [...prev];
           const imageFiles = files.filter(f => f.type.startsWith('image/'));
@@ -265,27 +265,6 @@ const FileDropZone = ({ onFilesUploaded }) => {
     }
   };
 
-  /**
-   * Downloads a specific file
-   * @param {string} filename - The filename on the server
-   * @param {string} originalName - The original file name for download
-   */
-  const downloadFile = (filename, originalName) => {
-    if (!filename) {
-      console.error('Cannot download: filename not available');
-      return;
-    }
-
-    const downloadUrl = `/api/download/${sessionId}/${filename}`;
-
-    // Create a temporary anchor element to trigger download
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = originalName || filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
   /**
    * Removes a single image from the thumbnails and uploaded files
@@ -381,20 +360,6 @@ const FileDropZone = ({ onFilesUploaded }) => {
                   <img src={thumbnail.url} alt={thumbnail.name} className="thumbnail-image" />
                   <div className="thumbnail-info">
                     <span className="thumbnail-name">{thumbnail.name}</span>
-                    <div className="thumbnail-actions">
-                      {thumbnail.filename && (
-                        <button
-                          className="download-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            downloadFile(thumbnail.filename, thumbnail.originalName);
-                          }}
-                          title="Download image"
-                        >
-                          ⬇️
-                        </button>
-                      )}
-                    </div>
                   </div>
                 </div>
               ))}
