@@ -341,7 +341,7 @@ function App() {
           <span className="pixel-text">Pixel </span>
           <span className="prompt-text">Prompt</span>
         </h1>
-        <p className="app-subtitle">Google Nano Banana Testing Interface</p>
+        <p className="app-subtitle">Spark Creativity, Pixel by Pixel</p>
       </header>
 
       <main className="app-main">
@@ -385,7 +385,7 @@ function App() {
                 placeholder={generatedImage
                   ? "Describe how to modify the current image..."
                   : "Describe what you want to generate..."}
-                rows={6}
+                rows={5}
               />
 
               <div className="prompt-actions">
