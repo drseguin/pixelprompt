@@ -461,10 +461,6 @@ function App() {
                   <p className="generation-time">
                     Generated: {new Date(generatedImage.timestamp).toLocaleString()}
                   </p>
-                  {generatedImage.isModification && (
-                    <p className="source-info">🔄 Modified from previous image</p>
-                  )}
-                  <p className="next-prompt-info">💡 Next prompt will modify this image</p>
                 </div>
               </div>
             ) : (
