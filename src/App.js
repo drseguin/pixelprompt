@@ -173,10 +173,15 @@ function App() {
     try {
       let result;
 
+      console.log('=== GENERATION DEBUG ===');
+      console.log('generatedImage exists:', !!generatedImage);
+      console.log('uploadedFiles.length:', uploadedFiles.length);
+      console.log('uploadedFiles:', uploadedFiles);
+
       // Priority: 1. Use current generated image, 2. Use uploaded files, 3. Generate from scratch
       if (generatedImage) {
         // Modify the current generated image
-        console.log('Modifying current generated image with prompt');
+        console.log('PATH: Modifying current generated image with prompt');
 
         // Extract base64 data from the current generated image
         const base64Data = generatedImage.url.split(',')[1]; // Remove data URL prefix
@@ -184,24 +189,32 @@ function App() {
 
       } else if (uploadedFiles.length > 0) {
         // Image editing with the first uploaded file
-        console.log('Editing first uploaded image with prompt');
+        console.log('PATH: Editing first uploaded image with prompt');
 
         // Convert only the first uploaded file to base64
         const firstFile = uploadedFiles[0];
+        console.log('First file details:', firstFile);
+        const imageUrl = `/uploads/${firstFile.uploadFolder}/${firstFile.filename}`;
+        console.log('Constructed image URL:', imageUrl);
+
         try {
-          const imageData = await nanoBananaApi.urlToBase64(`/uploads/${firstFile.uploadFolder}/${firstFile.filename}`);
+          console.log('Converting uploaded image to base64...');
+          const imageData = await nanoBananaApi.urlToBase64(imageUrl);
+          console.log('Image data conversion successful, mime type:', imageData.mimeType);
 
           // Format the prompt to be more explicit about editing the provided image
           const editPrompt = `Edit this image to: ${promptText}`;
+          console.log('Calling editImage API with prompt:', editPrompt);
 
           result = await nanoBananaApi.editImage([imageData], editPrompt);
+          console.log('editImage API call completed');
         } catch (error) {
           console.error('Failed to convert first image:', error);
           throw new Error('Could not process the first uploaded image');
         }
       } else {
         // Text-to-image generation
-        console.log('Generating image from text prompt');
+        console.log('PATH: Generating image from text prompt');
         result = await nanoBananaApi.generateImage(promptText);
       }
 

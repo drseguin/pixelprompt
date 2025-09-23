@@ -129,7 +129,13 @@ class NanoBananaApiService {
     }
 
     try {
-      console.log(`Editing ${images.length} image(s) with prompt:`, prompt);
+      console.log(`[NanoBananaAPI] Editing ${images.length} image(s) with prompt:`, prompt);
+      console.log('[NanoBananaAPI] Input images:', images.map(img => ({
+        type: typeof img,
+        hasData: !!(img?.data),
+        hasMimeType: !!(img?.mimeType),
+        dataLength: img?.data?.length || (typeof img === 'string' ? img.length : 0)
+      })));
 
       // Prepare content with images and prompt for multimodal input
       const parts = [];
@@ -150,6 +156,7 @@ class NanoBananaApiService {
           throw new Error(`Invalid image data at index ${index}`);
         }
 
+        console.log(`[NanoBananaAPI] Adding image ${index + 1}:`, { mimeType, dataLength: imageData.length });
         parts.push({
           inlineData: {
             data: imageData,
@@ -163,12 +170,20 @@ class NanoBananaApiService {
         text: prompt.trim()
       });
 
+      console.log(`[NanoBananaAPI] Final parts structure:`, parts.map(part => ({
+        hasInlineData: !!part.inlineData,
+        hasText: !!part.text,
+        text: part.text || '[IMAGE]'
+      })));
+
+      console.log('[NanoBananaAPI] Calling Gemini API...');
       const response = await this.client.models.generateContent({
         model: 'gemini-2.5-flash-image-preview',
         contents: [{
           parts: parts
         }],
       });
+      console.log('[NanoBananaAPI] Gemini API response received');
 
       // Extract image data from response
       const imageData = this.extractImageFromResponse(response);
