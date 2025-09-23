@@ -426,7 +426,7 @@ function App() {
                       type="button"
                       title="Download generated image"
                     >
-                      ⬇️ Download
+                      Download
                     </button>
                     {(imageHistory.length > 0 || generatedImage) && (
                       <button
@@ -434,7 +434,7 @@ function App() {
                         onClick={handleUndo}
                         type="button"
                       >
-                        ↶ Undo
+                        Undo
                       </button>
                     )}
                     <button
@@ -442,7 +442,7 @@ function App() {
                       onClick={handleStartOver}
                       type="button"
                     >
-                      🔄 Start Over
+                      Start Over
                     </button>
                   </div>
                 </div>

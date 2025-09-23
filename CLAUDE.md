@@ -4,14 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **pixelprompt**, a React application for testing Google's Gemini 2.5 Flash Image (Nano Banana) with file upload and prompt functionality featuring:
-- Drag & drop file upload with timestamped organization
-- Express.js backend with multer for file handling
-- Session-based file management with browser localStorage
-- Two-panel UI layout with orange theme
-- Docker containerization for easy deployment
-- Sequential file naming and thumbnail generation
+This is **pixelprompt**, a simplified React application for testing Google's Gemini 2.5 Flash Image API with image generation and editing capabilities:
+- Single-column layout with integrated drop zone
+- Direct file-to-image conversion (no server uploads)
 - Google Gemini API integration for image generation and editing
+- Simple prompt-based image modification workflow
+- Docker containerization for easy deployment
 
 ## Architecture
 
@@ -19,32 +17,28 @@ This is **pixelprompt**, a React application for testing Google's Gemini 2.5 Fla
 ```
 pixelprompt/
 ├── src/
-│   ├── components/         # React components
-│   │   ├── FileDropZone.js # Main upload component with drag-drop
-│   │   └── FileDropZone.css
 │   ├── services/
-│   │   └── nanoBananaApi.js # Google Gemini API integration service
+│   │   └── nanoBananaApi.js     # Google Gemini API integration service
 │   ├── utils/
-│   │   └── session.js      # Browser session management
-│   ├── App.js              # Main application component
-│   ├── App.css             # Application styles
-│   ├── index.js            # React entry point
-│   └── index.css           # Global styles
+│   │   └── session.js           # Browser session utilities (minimal usage)
+│   ├── App.js                   # Main application component
+│   ├── App.css                  # Application styles
+│   ├── index.js                 # React entry point
+│   └── index.css                # Global styles
 ├── config/
-│   └── settings.json       # Application configuration
-├── uploads/                # File upload directory (timestamped folders)
-├── public/                 # Static assets
-├── server.js               # Express backend server
-├── package.json            # Dependencies and scripts
+│   └── settings.json            # Application configuration
+├── public/                      # Static assets
+├── server.js                    # Express backend server (minimal)
+├── package.json                 # Dependencies and scripts
 └── Docker files + shell scripts
 ```
 
 ### Key Architectural Patterns
-- **Session-Based Organization**: Each browser session gets unique timestamped upload folders
-- **Client-Server Separation**: React frontend + Express backend with REST API
-- **File Management**: Multer handles uploads, files renamed sequentially (image_1, image_2, etc.)
-- **Timestamped Storage**: Files organized in "YYYY-MM-DD HH:MM:SS:SSS" Zulu time folders
-- **Session Persistence**: Browser localStorage maintains session across page reloads
+- **Simplified State Management**: Single `generatedImage` state for all images
+- **Direct File Processing**: Uploaded files converted directly to base64 for display
+- **API-First Workflow**: All image operations through Google Gemini API
+- **No Server Storage**: Files processed in-browser, no server-side file management
+- **Single-Column UI**: Centered layout with prompt input and image display/drop zone
 
 ## Common Development Commands
 
@@ -84,7 +78,7 @@ node server.js
 docker compose up -d --build
 docker compose logs -f
 docker compose down
-docker compose down -v  # Remove uploaded files
+docker compose down -v  # Remove any persistent data
 ```
 
 ## Development Rules (MANDATORY)
@@ -109,39 +103,23 @@ docker compose down -v  # Remove uploaded files
    - Document security implications for new settings
    - Test both frontend and backend integration
 
-## Configuration
+## Application Workflow
 
-### Main Configuration File: `config/settings.json`
-Key configuration areas:
-- **Upload Settings**: File types, size limits, max files, naming patterns
-- **UI Theme**: Orange color scheme, layout dimensions
-- **Security**: File validation, sanitization, upload rate limiting
-- **Development**: Port, logging, CORS settings
+### Simplified Image Processing Flow
+1. **No Image**: User enters prompt → Generate new image via Gemini API
+2. **Existing Image**: User enters prompt → Modify existing image via Gemini API
+3. **File Upload**: User drops/uploads file → Convert to generatedImage → Ready for modification
 
-### Session Management
-- Browser sessions use cryptographically secure UUIDs
-- Session data stored in localStorage with prefixed keys
-- Server tracks active upload sessions per session ID
-- Each session gets unique timestamped upload folder
+### Core State Management
+- **`generatedImage`**: Single state object containing current working image
+- **`imageHistory`**: Array of previous images for undo functionality
+- **`promptText`**: Current prompt input
+- **No complex file/session management required**
 
-## API Endpoints
-
-### Core File Operations
-```bash
-POST /api/upload              # Upload files to session folder
-GET  /api/settings            # Get application settings
-POST /api/settings            # Update application settings
-```
-
-### Session Management
-```bash
-GET  /api/session/{sessionId}            # Get session data
-POST /api/session/{sessionId}/new-upload # Start new upload session
-POST /api/session/{sessionId}/clear      # Clear session and files
-```
+## API Integration
 
 ### Google Gemini API Integration
-The application integrates with Google's Gemini 2.5 Flash Image API for image generation and editing:
+The application integrates with Google's Gemini 2.5 Flash Image API:
 - **Model**: `gemini-2.5-flash-image-preview`
 - **Service Module**: `src/services/nanoBananaApi.js`
 - **Rate Limits**: 10 requests/minute, 100 requests/hour
@@ -152,38 +130,26 @@ The application integrates with Google's Gemini 2.5 Flash Image API for image ge
   - Edit existing images with prompts
   - Convert files/URLs to base64 for API consumption
 
-## File Upload Process
+### API Call Structure
+```javascript
+// Text-to-image generation
+nanoBananaApi.generateImage(promptText)
 
-1. **Frontend**: User drops/selects files in FileDropZone component
-2. **Session Check**: Get or create browser session ID (localStorage)
-3. **Upload**: POST to `/api/upload` with session headers
-4. **Server Processing**:
-   - Create timestamped folder if needed
-   - Rename files sequentially (image_1.jpg, image_2.png, etc.)
-   - Store file metadata in session map
-5. **Response**: Return file metadata and folder info
-6. **UI Update**: Display thumbnails and file info
+// Image editing
+nanoBananaApi.editImage([base64ImageData], promptText)
+
+// File conversion
+nanoBananaApi.fileToBase64(file)
+```
 
 ## Key Components
 
-### FileDropZone (`src/components/FileDropZone.js`)
-- Handles drag-and-drop and click-to-upload
-- Generates thumbnails for image files
-- Manages session-based file organization
-- Integrates with session management utilities
-
-### Session Management (`src/utils/session.js`)
-- Browser session ID generation and persistence
-- Session-specific data storage in localStorage
-- Upload session state management
-- Cryptographically secure session IDs using crypto.randomUUID()
-
-### Express Server (`server.js`)
-- Multer configuration for file uploads
-- Timestamped folder creation
-- Session-based file organization
-- Settings API endpoints
-- File download and session cleanup functionality
+### Main App Component (`src/App.js`)
+- Centralized state management for images and prompts
+- Drag-and-drop file upload handling
+- Integration with Gemini API service
+- Undo/redo functionality for image history
+- Simple prompt-to-action workflow
 
 ### Nano Banana API Service (`src/services/nanoBananaApi.js`)
 - Google Gemini API client initialization and management
@@ -192,35 +158,24 @@ The application integrates with Google's Gemini 2.5 Flash Image API for image ge
 - Base64 conversion utilities for files and URLs
 - Error handling and response processing
 
-## Security Considerations
+### Minimal Backend (`server.js`)
+- Serves React build files
+- Settings API endpoints
+- Minimal configuration (mainly for API key storage)
+- No file upload or session management
 
-- File type validation on frontend and backend
-- File size limitations to prevent abuse
-- Sanitized file naming to prevent path traversal
-- Session isolation between users
-- Input validation for all user data
-- No sensitive data stored in browser localStorage
-- API key management for Google Gemini integration
-- Automatic session cleanup (24-hour expiration)
+## Configuration
 
-## Development Environment
+### Main Configuration File: `config/settings.json`
+Key configuration areas:
+- **API Settings**: Google Gemini API key storage
+- **UI Theme**: Orange color scheme, layout dimensions
+- **Development**: Port, logging, CORS settings
 
-### Dependencies
-- **Frontend**: React 18, Create React App
-- **Backend**: Express.js, Multer, CORS
-- **AI Integration**: Google Gemini API (@google/genai)
-- **Development**: Docker, Docker Compose
-
-### Browser Support
-- Chrome/Chromium 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-
-### Ports and URLs
-- **Development**: `http://localhost:3000` (React dev server)
-- **Production**: `http://localhost:3001` (Docker container)
-- **Backend API**: Port 3001
+### No Session Management
+- Application no longer uses complex session tracking
+- All image processing happens client-side
+- API key stored in backend configuration for security
 
 ## Testing and Quality
 
@@ -268,10 +223,9 @@ The project uses Create React App's built-in ESLint configuration. Code should f
 ```
 
 ### Current Icon Usage
-- **Upload/Folder**: `folder` icon in FileDropZone empty state
-- **Add/Plus**: `add` icon for add-more-button
+- **Drop Zone**: `add_photo_alternate` icon in empty state
 - **Loading**: `hourglass_empty` for generating state
-- **Ready**: `flash_on` for ready state
+- **Generated**: `flash_on` for ready state
 
 ### Icon Selection Guidelines
 - Choose semantically appropriate icons from Material Symbols
@@ -279,3 +233,31 @@ The project uses Create React App's built-in ESLint configuration. Code should f
 - Use outlined style for consistency with theme
 - Test icons at different display densities
 - Ensure accessibility with proper alt text when needed
+
+## Development Environment
+
+### Dependencies
+- **Frontend**: React 18, Create React App
+- **Backend**: Express.js (minimal), CORS
+- **AI Integration**: Google Gemini API (@google/genai)
+- **Development**: Docker, Docker Compose
+
+### Browser Support
+- Chrome/Chromium 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+
+### Ports and URLs
+- **Development**: `http://localhost:3000` (React dev server)
+- **Production**: `http://localhost:3001` (Docker container)
+- **Backend API**: Port 3001 (minimal endpoints)
+
+## Security Considerations
+
+- File type validation on frontend
+- File size limitations to prevent abuse
+- Input validation for all user data
+- API key management for Google Gemini integration
+- No file storage on server (client-side processing only)
+- Secure base64 conversion and handling
