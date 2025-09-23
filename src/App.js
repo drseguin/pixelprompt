@@ -19,13 +19,11 @@
  * - XSS prevention measures
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
-import FileDropZone from './components/FileDropZone';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import nanoBananaApi from './services/nanoBananaApi';
 import './App.css';
 
 function App() {
-  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [promptText, setPromptText] = useState('');
   const [, setSettings] = useState(null);
   const [generatedImage, setGeneratedImage] = useState(null);
@@ -33,6 +31,7 @@ function App() {
   const [imageHistory, setImageHistory] = useState([]);
   const [apiKeyInput, setApiKeyInput] = useState('');
   const [isApiReady, setIsApiReady] = useState(false);
+  const fileInputRef = useRef(null);
 
   /**
    * Loads application settings from backend
@@ -59,13 +58,6 @@ function App() {
     loadSettings();
   }, []);
 
-  /**
-   * Handles successful file uploads
-   * @param {Array} files - Array of uploaded file objects
-   */
-  const handleFilesUploaded = (files) => {
-    setUploadedFiles(prev => [...prev, ...files]);
-  };
 
   /**
    * Handles prompt text changes
@@ -173,48 +165,16 @@ function App() {
     try {
       let result;
 
-      console.log('=== GENERATION DEBUG ===');
-      console.log('generatedImage exists:', !!generatedImage);
-      console.log('uploadedFiles.length:', uploadedFiles.length);
-      console.log('uploadedFiles:', uploadedFiles);
-
-      // Priority: 1. Use current generated image, 2. Use uploaded files, 3. Generate from scratch
       if (generatedImage) {
         // Modify the current generated image
-        console.log('PATH: Modifying current generated image with prompt');
+        console.log('Modifying existing image with prompt');
 
         // Extract base64 data from the current generated image
         const base64Data = generatedImage.url.split(',')[1]; // Remove data URL prefix
         result = await nanoBananaApi.editImage([base64Data], promptText);
-
-      } else if (uploadedFiles.length > 0) {
-        // Image editing with the first uploaded file
-        console.log('PATH: Editing first uploaded image with prompt');
-
-        // Convert only the first uploaded file to base64
-        const firstFile = uploadedFiles[0];
-        console.log('First file details:', firstFile);
-        const imageUrl = `/uploads/${firstFile.uploadFolder}/${firstFile.filename}`;
-        console.log('Constructed image URL:', imageUrl);
-
-        try {
-          console.log('Converting uploaded image to base64...');
-          const imageData = await nanoBananaApi.urlToBase64(imageUrl);
-          console.log('Image data conversion successful, mime type:', imageData.mimeType);
-
-          // Format the prompt to be more explicit about editing the provided image
-          const editPrompt = `Using the provided image, please modify it to: ${promptText}. Keep the overall composition and only change what I've specified. Do not create a new image - edit the existing one.`;
-          console.log('Calling editImage API with prompt:', editPrompt);
-
-          result = await nanoBananaApi.editImage([imageData], editPrompt);
-          console.log('editImage API call completed');
-        } catch (error) {
-          console.error('Failed to convert first image:', error);
-          throw new Error('Could not process the first uploaded image');
-        }
       } else {
         // Text-to-image generation
-        console.log('PATH: Generating image from text prompt');
+        console.log('Generating new image from text prompt');
         result = await nanoBananaApi.generateImage(promptText);
       }
 
@@ -230,7 +190,7 @@ function App() {
           // If modifying an existing image, append new prompt to previous prompt
           fullPrompt = `${generatedImage.prompt} → ${promptText}`;
         } else {
-          // First generation or editing uploaded image
+          // First generation
           fullPrompt = promptText;
         }
 
@@ -240,7 +200,6 @@ function App() {
           url: imageUrl,
           prompt: fullPrompt,
           timestamp: new Date().toISOString(),
-          isFromUpload: uploadedFiles.length > 0 && !generatedImage,
           isModification: !!generatedImage
         });
 
@@ -287,6 +246,74 @@ function App() {
   };
 
   /**
+   * Handle file upload and convert to generated image
+   * @param {File} file - The uploaded image file
+   */
+  const handleFileUpload = async (file) => {
+    if (!file || !file.type.startsWith('image/')) {
+      alert('Please upload a valid image file.');
+      return;
+    }
+
+    try {
+      // Save current image to history if it exists
+      if (generatedImage) {
+        setImageHistory(prev => [...prev, generatedImage]);
+      }
+
+      // Convert file to base64 for display
+      const imageData = await nanoBananaApi.fileToBase64(file);
+      const imageUrl = `data:${imageData.mimeType};base64,${imageData.data}`;
+
+      setGeneratedImage({
+        url: imageUrl,
+        prompt: `Uploaded: ${file.name}`,
+        timestamp: new Date().toISOString(),
+        isModification: false
+      });
+
+      console.log('File uploaded and set as generated image');
+    } catch (error) {
+      console.error('Failed to upload file:', error);
+      alert('Failed to upload file. Please try again.');
+    }
+  };
+
+  /**
+   * Handle drag and drop events
+   */
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  };
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = (e) => {
+    const files = e.target.files;
+    if (files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  };
+
+  /**
    * Download the generated image
    */
   const handleDownloadGenerated = () => {
@@ -318,106 +345,75 @@ function App() {
       </header>
 
       <main className="app-main">
-        <div className="app-layout">
-          {/* Left Panel - File Upload and Prompt */}
-          <div className="left-panel">
-            <section className="upload-section">
-              <h2 className="section-title">Upload Images</h2>
-              <FileDropZone onFilesUploaded={handleFilesUploaded} />
-            </section>
-
-            <section className="prompt-section">
-              <h2 className="section-title">Prompt</h2>
-              <textarea
-                className="prompt-textarea"
-                value={promptText}
-                onChange={handlePromptChange}
-                placeholder={uploadedFiles.length > 0 && !generatedImage
-                  ? "Describe what to change in your uploaded image (e.g., 'add a red hat', 'change background to forest', 'make it look like a painting')..."
-                  : generatedImage
-                  ? "Describe how to modify the current image..."
-                  : "Describe what you want to generate..."}
-                rows={3}
+        {!isApiReady && (
+          <div className="api-key-section">
+            <label htmlFor="api-key" className="api-key-label">
+              Google AI API Key:
+            </label>
+            <div className="api-key-input-group">
+              <input
+                id="api-key"
+                type="password"
+                className="api-key-input"
+                value={apiKeyInput}
+                onChange={handleApiKeyChange}
+                placeholder="Enter your Google AI API key"
               />
-
-              {uploadedFiles.length > 0 && !generatedImage && (
-                <div className="editing-tips">
-                  <h4>💡 Editing Tips:</h4>
-                  <ul>
-                    <li><strong>Be specific:</strong> "Add a blue baseball cap" instead of "add hat"</li>
-                    <li><strong>Describe changes:</strong> "Change the sky to sunset colors"</li>
-                    <li><strong>Style modifications:</strong> "Make it look like a watercolor painting"</li>
-                    <li><strong>Add/remove objects:</strong> "Remove the person in the background"</li>
-                  </ul>
-                </div>
-              )}
-
-              {uploadedFiles.length > 0 && !generatedImage && (
-                <div className="current-edit-target">
-                  <p><strong>🎯 Will edit:</strong> {uploadedFiles[0].originalName} (first uploaded image)</p>
-                </div>
-              )}
-
-              {!isApiReady && (
-                <div className="api-key-section">
-                  <label htmlFor="api-key" className="api-key-label">
-                    Google AI API Key:
-                  </label>
-                  <div className="api-key-input-group">
-                    <input
-                      id="api-key"
-                      type="password"
-                      className="api-key-input"
-                      value={apiKeyInput}
-                      onChange={handleApiKeyChange}
-                      placeholder="Enter your Google AI API key"
-                    />
-                    <button
-                      className="api-key-submit"
-                      onClick={handleApiKeySubmit}
-                      disabled={!apiKeyInput.trim()}
-                      type="button"
-                    >
-                      Set Key
-                    </button>
-                  </div>
-                  <p className="api-key-help">
-                    Get your API key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
-                  </p>
-                </div>
-              )}
-
-              <div className="prompt-actions">
-                <button
-                  className="generate-button"
-                  disabled={!promptText.trim() || !isApiReady || isGenerating}
-                  onClick={handleGenerate}
-                  type="button"
-                >
-                  {isGenerating
-                    ? 'Generating...'
-                    : uploadedFiles.length > 0 && !generatedImage
-                      ? 'Edit Uploaded Image'
-                      : generatedImage
-                        ? 'Modify Image'
-                        : 'Generate Image'
-                  }
-                </button>
-                {promptText.trim() && (
-                  <button
-                    className="clear-prompt-button"
-                    onClick={handleClearPrompt}
-                    type="button"
-                    title="Clear prompt"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
-            </section>
+              <button
+                className="api-key-submit"
+                onClick={handleApiKeySubmit}
+                disabled={!apiKeyInput.trim()}
+                type="button"
+              >
+                Set Key
+              </button>
+            </div>
+            <p className="api-key-help">
+              Get your API key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
+            </p>
           </div>
+        )}
 
-          {/* Right Panel - Generated Image Display */}
+        <div className="prompt-section">
+          <textarea
+            className="prompt-textarea"
+            value={promptText}
+            onChange={handlePromptChange}
+            placeholder={generatedImage
+              ? "Describe how to modify the current image..."
+              : "Describe what you want to generate..."}
+            rows={3}
+          />
+
+          <div className="prompt-actions">
+            <button
+              className="generate-button"
+              disabled={!promptText.trim() || !isApiReady || isGenerating}
+              onClick={handleGenerate}
+              type="button"
+            >
+              {isGenerating
+                ? 'Generating...'
+                : generatedImage
+                  ? 'Modify Image'
+                  : 'Generate Image'
+              }
+            </button>
+            {promptText.trim() && (
+              <button
+                className="clear-prompt-button"
+                onClick={handleClearPrompt}
+                type="button"
+                title="Clear prompt"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="image-section">
+          {/* Image Display and Drop Zone */}
           <div className="right-panel">
             {generatedImage ? (
               <div className="generated-image-container">
@@ -465,9 +461,6 @@ function App() {
                   <p className="generation-time">
                     Generated: {new Date(generatedImage.timestamp).toLocaleString()}
                   </p>
-                  {generatedImage.isFromUpload && (
-                    <p className="source-info">✨ Based on {uploadedFiles.length} uploaded image(s)</p>
-                  )}
                   {generatedImage.isModification && (
                     <p className="source-info">🔄 Modified from previous image</p>
                   )}
@@ -475,15 +468,31 @@ function App() {
                 </div>
               </div>
             ) : (
-              <div className="empty-panel">
-                <div className="empty-panel-content">
-                  <div className="material-symbols-outlined empty-icon">{isGenerating ? 'hourglass_empty' : 'flash_on'}</div>
-                  <h3>{isGenerating ? 'Generating...' : 'Ready for Magic'}</h3>
+              <div
+                className="drop-zone"
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onClick={handleClick}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                />
+                <div className="drop-zone-content">
+                  <div className="material-symbols-outlined drop-icon">
+                    {isGenerating ? 'hourglass_empty' : 'add_photo_alternate'}
+                  </div>
+                  <h3>{isGenerating ? 'Generating...' : 'Drop Image or Generate'}</h3>
                   <p>
                     {isGenerating
                       ? 'Creating your image...'
                       : isApiReady
-                        ? 'Generated content will appear here'
+                        ? 'Drop an image to edit or enter a prompt to generate'
                         : 'Please configure your API key to get started'
                     }
                   </p>

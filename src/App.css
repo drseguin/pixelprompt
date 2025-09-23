@@ -103,26 +103,26 @@
   margin: 0 auto;
 }
 
-.app-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  min-height: calc(100vh - 200px);
+.app-main {
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-/* Panel Styles */
-.left-panel, .right-panel {
+.prompt-section {
+  margin-bottom: 24px;
+}
+
+.image-section {
   background: #ffffff;
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e5e7;
 }
 
-.left-panel:hover, .right-panel:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+/* Panel Styles */
+.right-panel {
+  width: 100%;
 }
 
 /* Section Styles */
@@ -223,21 +223,31 @@
   box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
 }
 
-/* Right Panel */
-.empty-panel {
+/* Drop Zone */
+.drop-zone {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
   min-height: 400px;
+  border: 2px dashed #e5e5e7;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.empty-panel-content {
+.drop-zone:hover {
+  border-color: #F19E39;
+  background-color: #fff9f5;
+}
+
+.drop-zone-content {
   text-align: center;
   color: #8e8e93;
+  pointer-events: none;
 }
 
-.empty-icon {
+.drop-icon {
   font-size: 3em;
   margin-bottom: 16px;
   opacity: 0.6;
@@ -249,14 +259,14 @@
     'opsz' 24;
 }
 
-.empty-panel-content h3 {
+.drop-zone-content h3 {
   color: #6e6e73;
   margin: 0 0 8px 0;
   font-size: 1.2em;
   font-weight: 600;
 }
 
-.empty-panel-content p {
+.drop-zone-content p {
   margin: 0;
   color: #8e8e93;
   font-size: 0.95em;

@@ -85,7 +85,7 @@ class NanoBananaApiService {
 
       const response = await this.client.models.generateContent({
         model: 'gemini-2.5-flash-image-preview',
-        contents: prompt.trim(),
+        contents: [{ text: prompt.trim() }],
       });
 
       // Extract image data from response
@@ -180,9 +180,7 @@ class NanoBananaApiService {
       console.log('[NanoBananaAPI] Calling Gemini API...');
       const response = await this.client.models.generateContent({
         model: 'gemini-2.5-flash-image-preview',
-        contents: [{
-          parts: parts
-        }],
+        contents: parts,
       });
       console.log('[NanoBananaAPI] Gemini API response received');
 
