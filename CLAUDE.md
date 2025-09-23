@@ -181,16 +181,22 @@ promptAnalyzer.analyzePrompt(promptText)
 
 ## Configuration
 
-### Main Configuration File: `config/settings.json`
-Key configuration areas:
-- **API Settings**: Google Gemini API key storage
-- **UI Theme**: Orange color scheme, layout dimensions
-- **Development**: Port, logging, CORS settings
+### Environment Configuration: `.env`
+Primary configuration method using environment variables:
+- **GEMINI_API_KEY**: Google Gemini API key (required for image generation/editing)
+- **NODE_ENV**: Environment setting (development/production)
+- **PORT**: Server port (default: 3001)
 
-### No Session Management
-- Application no longer uses complex session tracking
-- All image processing happens client-side
-- API key stored in backend configuration for security
+### Legacy Configuration: `config/settings.json`
+Additional configuration areas:
+- **UI Theme**: Orange color scheme, layout dimensions
+- **Development**: Logging, CORS settings
+
+### API Key Management
+- **Primary**: Environment variable `GEMINI_API_KEY` in `.env` file
+- **Fallback**: Backend configuration endpoint for runtime key setting
+- **Security**: `.env` file should be excluded from version control
+- All image processing happens client-side for security
 
 ## Testing and Quality
 
