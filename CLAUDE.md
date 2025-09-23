@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 This is **pixelprompt**, a simplified React application for testing Google's Gemini 2.5 Flash Image API with image generation and editing capabilities:
-- Single-column layout with integrated drop zone
+- Two-panel layout: prompt on left, image/upload on right
 - Direct file-to-image conversion (no server uploads)
 - Google Gemini API integration for image generation and editing
 - Simple prompt-based image modification workflow
@@ -38,7 +38,7 @@ pixelprompt/
 - **Direct File Processing**: Uploaded files converted directly to base64 for display
 - **API-First Workflow**: All image operations through Google Gemini API
 - **No Server Storage**: Files processed in-browser, no server-side file management
-- **Single-Column UI**: Centered layout with prompt input and image display/drop zone
+- **Two-Panel UI**: Left panel for prompt input, right panel for image display/drop zone
 
 ## Common Development Commands
 
@@ -194,6 +194,21 @@ The project uses Create React App's built-in ESLint configuration. Code should f
 2. **Development**: Use `./stlog.sh` to monitor real-time logs
 3. **Testing Changes**: Rebuild with `docker compose up -d --build`
 4. **Cleanup**: Run `./stop.sh` to stop containers
+
+## UI Styling Standards
+
+### Title Styling Requirements
+- **Title Format**: "PixelPrompt" as one unified word
+- **Color Scheme**: "Pixel" in black (#1d1d1f), "Prompt" in orange (#F19E39)
+- **Font Consistency**: Both parts must use identical font properties (family, size, weight, letter-spacing)
+- **Display**: Must appear inline as a single line, never wrapped
+- **Implementation**: Use spans with forced inline styling and `!important` declarations to override any conflicting CSS
+
+### Layout Architecture
+- **Two-Panel Grid**: Left panel (prompt), right panel (image/upload)
+- **Responsive Design**: Stacks vertically on mobile/tablet (max-width: 1024px)
+- **Panel Styling**: White background, rounded corners, subtle shadows
+- **Prompt Height**: Fixed to 5 lines using `calc(1.5em * 5 + 32px)`
 
 ## Icon Usage Standards
 
