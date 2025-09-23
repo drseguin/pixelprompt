@@ -461,6 +461,20 @@
   color: #1d1d1f;
   font-weight: 500;
   word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.prompt-text {
+  font-weight: 400;
+  font-style: italic;
+  color: #6e6e73;
+  display: block;
+  margin-top: 4px;
+}
+
+/* Style for prompt history arrows */
+.prompt-text:has-text(" → ") {
+  white-space: pre-wrap;
 }
 
 .generation-time {

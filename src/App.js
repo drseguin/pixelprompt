@@ -211,17 +211,30 @@ function App() {
           setImageHistory(prev => [...prev, generatedImage]);
         }
 
+        // Build concatenated prompt history
+        let fullPrompt;
+        if (generatedImage && generatedImage.prompt) {
+          // If modifying an existing image, append new prompt to previous prompt
+          fullPrompt = `${generatedImage.prompt} → ${promptText}`;
+        } else {
+          // First generation or editing uploaded image
+          fullPrompt = promptText;
+        }
+
         // Create data URL for display
         const imageUrl = `data:${result.mimeType};base64,${result.imageData}`;
         setGeneratedImage({
           url: imageUrl,
-          prompt: promptText,
+          prompt: fullPrompt,
           timestamp: new Date().toISOString(),
           isFromUpload: uploadedFiles.length > 0 && !generatedImage,
           isModification: !!generatedImage
         });
 
         console.log('Image generated successfully');
+
+        // Clear the prompt input after successful generation
+        setPromptText('');
       }
 
     } catch (error) {
@@ -407,7 +420,10 @@ function App() {
                   />
                 </div>
                 <div className="generated-image-info">
-                  <p className="prompt-used">Prompt: "{generatedImage.prompt}"</p>
+                  <div className="prompt-used">
+                    <strong>Prompt{generatedImage.prompt.includes(' → ') ? ' History' : ''}:</strong>
+                    <span className="prompt-text">"{generatedImage.prompt}"</span>
+                  </div>
                   <p className="generation-time">
                     Generated: {new Date(generatedImage.timestamp).toLocaleString()}
                   </p>
