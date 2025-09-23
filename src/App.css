@@ -83,20 +83,19 @@
   gap: 0;
 }
 
-.pixel-text {
-  color: #1d1d1f;
+.pixel-text, .prompt-text {
   font-size: inherit;
   font-weight: inherit;
   font-family: inherit;
   letter-spacing: inherit;
 }
 
+.pixel-text {
+  color: #1d1d1f;
+}
+
 .prompt-text {
-  color: #F19E39 !important;
-  font-size: inherit;
-  font-weight: inherit;
-  font-family: inherit;
-  letter-spacing: inherit;
+  color: #F19E39;
 }
 
 .app-subtitle {
