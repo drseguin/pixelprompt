@@ -165,9 +165,10 @@ class NanoBananaApiService {
         });
       });
 
-      // Add text prompt
+      // Add text prompt with explicit editing instruction
+      const explicitEditPrompt = `${prompt.trim()}`;
       parts.push({
-        text: prompt.trim()
+        text: explicitEditPrompt
       });
 
       console.log(`[NanoBananaAPI] Final parts structure:`, parts.map(part => ({

@@ -1,5 +1,58 @@
 /* Apple Minimalist Design for Pixel Prompt */
 
+/* Editing Tips Styles */
+.editing-tips {
+  background: #f7f7f9;
+  border: 1px solid #e5e5e7;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 12px;
+  font-size: 0.9em;
+}
+
+.editing-tips h4 {
+  margin: 0 0 8px 0;
+  font-size: 1em;
+  font-weight: 600;
+  color: #F19E39;
+}
+
+.editing-tips ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.editing-tips li {
+  margin-bottom: 4px;
+  color: #6e6e73;
+  line-height: 1.4;
+}
+
+.editing-tips strong {
+  color: #1d1d1f;
+  font-weight: 600;
+}
+
+/* Current Edit Target Styles */
+.current-edit-target {
+  background: #fff3e0;
+  border: 1px solid #F19E39;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 0.9em;
+}
+
+.current-edit-target p {
+  margin: 0;
+  color: #1d1d1f;
+}
+
+.current-edit-target strong {
+  color: #F19E39;
+}
+
 .app {
   min-height: 100vh;
   background: #fafafa;

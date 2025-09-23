@@ -203,7 +203,7 @@ function App() {
           console.log('Image data conversion successful, mime type:', imageData.mimeType);
 
           // Format the prompt to be more explicit about editing the provided image
-          const editPrompt = `Edit this image to: ${promptText}`;
+          const editPrompt = `Using the provided image, please modify it to: ${promptText}. Keep the overall composition and only change what I've specified. Do not create a new image - edit the existing one.`;
           console.log('Calling editImage API with prompt:', editPrompt);
 
           result = await nanoBananaApi.editImage([imageData], editPrompt);
@@ -332,9 +332,32 @@ function App() {
                 className="prompt-textarea"
                 value={promptText}
                 onChange={handlePromptChange}
-                placeholder="Describe what you want to generate or edit..."
+                placeholder={uploadedFiles.length > 0 && !generatedImage
+                  ? "Describe what to change in your uploaded image (e.g., 'add a red hat', 'change background to forest', 'make it look like a painting')..."
+                  : generatedImage
+                  ? "Describe how to modify the current image..."
+                  : "Describe what you want to generate..."}
                 rows={3}
               />
+
+              {uploadedFiles.length > 0 && !generatedImage && (
+                <div className="editing-tips">
+                  <h4>💡 Editing Tips:</h4>
+                  <ul>
+                    <li><strong>Be specific:</strong> "Add a blue baseball cap" instead of "add hat"</li>
+                    <li><strong>Describe changes:</strong> "Change the sky to sunset colors"</li>
+                    <li><strong>Style modifications:</strong> "Make it look like a watercolor painting"</li>
+                    <li><strong>Add/remove objects:</strong> "Remove the person in the background"</li>
+                  </ul>
+                </div>
+              )}
+
+              {uploadedFiles.length > 0 && !generatedImage && (
+                <div className="current-edit-target">
+                  <p><strong>🎯 Will edit:</strong> {uploadedFiles[0].originalName} (first uploaded image)</p>
+                </div>
+              )}
+
               {!isApiReady && (
                 <div className="api-key-section">
                   <label htmlFor="api-key" className="api-key-label">
