@@ -338,8 +338,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1 className="app-title">
-          <span className="pixel-text">Pixel </span>
-          <span className="prompt-text">Prompt</span>
+          <span className="pixel-text">Pixel</span><span className="prompt-text">Prompt</span>
         </h1>
         <p className="app-subtitle">Spark Creativity, Pixel by Pixel</p>
       </header>
