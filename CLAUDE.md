@@ -4,13 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **pixelprompt**, a React application for testing Google's Nano Banana with file upload and prompt functionality featuring:
+This is **pixelprompt**, a React application for testing Google's Gemini 2.5 Flash Image (Nano Banana) with file upload and prompt functionality featuring:
 - Drag & drop file upload with timestamped organization
 - Express.js backend with multer for file handling
 - Session-based file management with browser localStorage
 - Two-panel UI layout with orange theme
 - Docker containerization for easy deployment
 - Sequential file naming and thumbnail generation
+- Google Gemini API integration for image generation and editing
 
 ## Architecture
 
@@ -21,6 +22,8 @@ pixelprompt/
 │   ├── components/         # React components
 │   │   ├── FileDropZone.js # Main upload component with drag-drop
 │   │   └── FileDropZone.css
+│   ├── services/
+│   │   └── nanoBananaApi.js # Google Gemini API integration service
 │   ├── utils/
 │   │   └── session.js      # Browser session management
 │   ├── App.js              # Main application component
@@ -137,12 +140,17 @@ POST /api/session/{sessionId}/new-upload # Start new upload session
 POST /api/session/{sessionId}/clear      # Clear session and files
 ```
 
-### Google Nano Banana Integration
-The application integrates with Google's Gemini API for image analysis:
+### Google Gemini API Integration
+The application integrates with Google's Gemini 2.5 Flash Image API for image generation and editing:
 - **Model**: `gemini-2.5-flash-image-preview`
+- **Service Module**: `src/services/nanoBananaApi.js`
 - **Rate Limits**: 10 requests/minute, 100 requests/hour
 - **Supported Formats**: JPEG, PNG, WebP, GIF
-- **Max Images**: 3 per request
+- **Max Images**: 3 per request for editing
+- **Features**:
+  - Generate images from text prompts
+  - Edit existing images with prompts
+  - Convert files/URLs to base64 for API consumption
 
 ## File Upload Process
 
@@ -168,12 +176,21 @@ The application integrates with Google's Gemini API for image analysis:
 - Browser session ID generation and persistence
 - Session-specific data storage in localStorage
 - Upload session state management
+- Cryptographically secure session IDs using crypto.randomUUID()
 
 ### Express Server (`server.js`)
 - Multer configuration for file uploads
 - Timestamped folder creation
 - Session-based file organization
 - Settings API endpoints
+- File download and session cleanup functionality
+
+### Nano Banana API Service (`src/services/nanoBananaApi.js`)
+- Google Gemini API client initialization and management
+- Image generation from text prompts
+- Image editing with multimodal inputs (images + text)
+- Base64 conversion utilities for files and URLs
+- Error handling and response processing
 
 ## Security Considerations
 
@@ -183,6 +200,8 @@ The application integrates with Google's Gemini API for image analysis:
 - Session isolation between users
 - Input validation for all user data
 - No sensitive data stored in browser localStorage
+- API key management for Google Gemini integration
+- Automatic session cleanup (24-hour expiration)
 
 ## Development Environment
 
@@ -209,6 +228,7 @@ The application integrates with Google's Gemini API for image analysis:
 ```bash
 npm test                    # Run React test suite
 npm test -- --coverage     # Run tests with coverage report
+npm test -- --watchAll     # Run tests in watch mode
 ```
 
 ### Linting and Code Quality
