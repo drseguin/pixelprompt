@@ -600,6 +600,121 @@
   100% { transform: rotate(360deg); }
 }
 
+/* Best Practices Section */
+.best-practices-section {
+  background: #f7f7f9;
+  border: 1px solid #e5e5e7;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.best-practices-title {
+  margin: 0 0 8px 0;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #F19E39;
+}
+
+.best-practices-subtitle {
+  margin: 0 0 16px 0;
+  font-size: 0.9em;
+  color: #6e6e73;
+}
+
+.best-practices-list {
+  margin-bottom: 20px;
+}
+
+.practice-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.practice-number {
+  color: #F19E39;
+  font-weight: 600;
+  min-width: 20px;
+  margin-right: 8px;
+}
+
+.practice-label {
+  color: #1d1d1f;
+  font-weight: 600;
+  min-width: 80px;
+  margin-right: 8px;
+}
+
+.practice-example {
+  color: #6e6e73;
+  flex: 1;
+}
+
+.example-prompt-section {
+  border-top: 1px solid #e5e5e7;
+  padding-top: 16px;
+}
+
+.example-prompt-title {
+  margin: 0 0 12px 0;
+  font-size: 1em;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.example-prompt-container {
+  background: #ffffff;
+  border: 1px solid #e5e5e7;
+  border-radius: 8px;
+  padding: 12px;
+  position: relative;
+}
+
+.example-prompt-text {
+  margin: 0 0 12px 0;
+  font-size: 0.9em;
+  color: #1d1d1f;
+  line-height: 1.4;
+  font-style: italic;
+  padding-right: 80px;
+}
+
+.copy-prompt-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #F19E39;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.8em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.copy-prompt-button:hover {
+  background: #ea580c;
+  transform: translateY(-1px);
+}
+
+.copy-prompt-button .material-symbols-outlined {
+  font-size: 16px;
+  color: inherit;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 16;
+}
+
 /* Smooth transitions for all interactive elements */
 * {
   -webkit-font-smoothing: antialiased;
