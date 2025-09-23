@@ -192,7 +192,7 @@ function App() {
           const imageData = await nanoBananaApi.urlToBase64(`/uploads/${firstFile.uploadFolder}/${firstFile.filename}`);
 
           // Format the prompt to be more explicit about editing the provided image
-          const editPrompt = `Modify this image: ${promptText}`;
+          const editPrompt = `Edit this image to: ${promptText}`;
 
           result = await nanoBananaApi.editImage([imageData], editPrompt);
         } catch (error) {
@@ -360,9 +360,11 @@ function App() {
                 >
                   {isGenerating
                     ? 'Generating...'
-                    : generatedImage
-                      ? 'Modify Image'
-                      : (uploadedFiles.length > 0 ? 'Edit First Image' : 'Generate Image')
+                    : uploadedFiles.length > 0 && !generatedImage
+                      ? 'Edit Uploaded Image'
+                      : generatedImage
+                        ? 'Modify Image'
+                        : 'Generate Image'
                   }
                 </button>
                 {promptText.trim() && (
