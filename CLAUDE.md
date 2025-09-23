@@ -219,3 +219,43 @@ The project uses Create React App's built-in ESLint configuration. Code should f
 2. **Development**: Use `./stlog.sh` to monitor real-time logs
 3. **Testing Changes**: Rebuild with `docker compose up -d --build`
 4. **Cleanup**: Run `./stop.sh` to stop containers
+
+## Icon Usage Standards
+
+**MANDATORY**: All UI icons must use Google Material Icons with standardized configuration.
+
+### Required Icon Source and Configuration
+- **URL**: https://fonts.google.com/icons?selected=Material+Symbols+Outlined:sync:FILL@0;wght@400;GRAD@0;opsz@24&icon.size=24&icon.color=%23F19E39
+- **Style**: Material Symbols Outlined
+- **Configuration**: FILL@0;wght@400;GRAD@0;opsz@24
+- **Size**: 24px base (scales with font-size)
+- **Color**: #F19E39 (Orange theme color)
+
+### Implementation Requirements
+```css
+.icon-class {
+  color: #F19E39;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+```
+
+```jsx
+<span className="material-symbols-outlined icon-class">icon_name</span>
+```
+
+### Current Icon Usage
+- **Upload/Folder**: `folder` icon in FileDropZone empty state
+- **Add/Plus**: `add` icon for add-more-button
+- **Loading**: `hourglass_empty` for generating state
+- **Ready**: `flash_on` for ready state
+
+### Icon Selection Guidelines
+- Choose semantically appropriate icons from Material Symbols
+- Maintain visual consistency across the application
+- Use outlined style for consistency with theme
+- Test icons at different display densities
+- Ensure accessibility with proper alt text when needed

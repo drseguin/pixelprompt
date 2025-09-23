@@ -423,7 +423,7 @@ function App() {
             ) : (
               <div className="empty-panel">
                 <div className="empty-panel-content">
-                  <div className="empty-icon">{isGenerating ? '⏳' : '⚡'}</div>
+                  <div className="material-symbols-outlined empty-icon">{isGenerating ? 'hourglass_empty' : 'flash_on'}</div>
                   <h3>{isGenerating ? 'Generating...' : 'Ready for Magic'}</h3>
                   <p>
                     {isGenerating

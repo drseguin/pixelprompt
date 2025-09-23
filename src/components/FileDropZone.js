@@ -399,13 +399,13 @@ const FileDropZone = ({ onFilesUploaded }) => {
                 </div>
               ))}
               <div className="add-more-button">
-                <span className="add-icon">+</span>
+                <span className="material-symbols-outlined add-icon">add</span>
                 <p>Add more files</p>
               </div>
             </div>
           ) : (
             <div className="empty-state">
-              <div className="upload-icon">📁</div>
+              <div className="material-symbols-outlined upload-icon">folder</div>
               <h3>Drop files here or click to upload</h3>
               <p>Supports multiple image files</p>
             </div>
