@@ -86,7 +86,7 @@ docker compose down -v  # Remove uploaded files
 
 ## Development Rules (MANDATORY)
 
-**⚠️ CRITICAL**: This project enforces strict development standards. See `DEVELOPMENT_RULES.md` for complete requirements.
+**⚠️ CRITICAL**: This project enforces strict development standards for consistent, maintainable code.
 
 ### Key Requirements
 1. **File Headers**: All source files must have comprehensive JSDoc headers including:
@@ -104,6 +104,7 @@ docker compose down -v  # Remove uploaded files
    - Ensure backend server handles new configuration options
    - Update UI components that reference config values
    - Document security implications for new settings
+   - Test both frontend and backend integration
 
 ## Configuration
 
@@ -122,17 +123,26 @@ Key configuration areas:
 
 ## API Endpoints
 
+### Core File Operations
 ```bash
-# File Operations
 POST /api/upload              # Upload files to session folder
 GET  /api/settings            # Get application settings
 POST /api/settings            # Update application settings
+```
 
-# Session Management
+### Session Management
+```bash
 GET  /api/session/{sessionId}            # Get session data
 POST /api/session/{sessionId}/new-upload # Start new upload session
 POST /api/session/{sessionId}/clear      # Clear session and files
 ```
+
+### Google Nano Banana Integration
+The application integrates with Google's Gemini API for image analysis:
+- **Model**: `gemini-2.5-flash-image-preview`
+- **Rate Limits**: 10 requests/minute, 100 requests/hour
+- **Supported Formats**: JPEG, PNG, WebP, GIF
+- **Max Images**: 3 per request
 
 ## File Upload Process
 
@@ -179,6 +189,7 @@ POST /api/session/{sessionId}/clear      # Clear session and files
 ### Dependencies
 - **Frontend**: React 18, Create React App
 - **Backend**: Express.js, Multer, CORS
+- **AI Integration**: Google Gemini API (@google/genai)
 - **Development**: Docker, Docker Compose
 
 ### Browser Support
@@ -187,4 +198,24 @@ POST /api/session/{sessionId}/clear      # Clear session and files
 - Safari 14+
 - Edge 90+
 
-Application runs on `http://localhost:3001` when started via Docker.
+### Ports and URLs
+- **Development**: `http://localhost:3000` (React dev server)
+- **Production**: `http://localhost:3001` (Docker container)
+- **Backend API**: Port 3001
+
+## Testing and Quality
+
+### Running Tests
+```bash
+npm test                    # Run React test suite
+npm test -- --coverage     # Run tests with coverage report
+```
+
+### Linting and Code Quality
+The project uses Create React App's built-in ESLint configuration. Code should follow React best practices and JSDoc documentation standards.
+
+### Docker Development Workflow
+1. **Initial Setup**: Run `./start.sh` to build and start containers
+2. **Development**: Use `./stlog.sh` to monitor real-time logs
+3. **Testing Changes**: Rebuild with `docker compose up -d --build`
+4. **Cleanup**: Run `./stop.sh` to stop containers
