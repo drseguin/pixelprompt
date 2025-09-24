@@ -392,13 +392,14 @@ function App() {
    */
   const loadSavedPrompts = async () => {
     try {
-      const response = await fetch('/api/prompts');
+      const response = await fetch('/Prompts.json');
       if (response.ok) {
         const prompts = await response.json();
         setSavedPrompts(prompts);
       }
     } catch (error) {
       console.error('Failed to load saved prompts:', error);
+      setSavedPrompts([]); // Set empty array as fallback
     }
   };
 
