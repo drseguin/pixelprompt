@@ -612,6 +612,17 @@ function App() {
                     Clear
                   </button>
                 )}
+                {/* Start Over Button - appears when image is generated */}
+                {generatedImage && (
+                  <button
+                    className="start-over-button-inline"
+                    onClick={handleStartOver}
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined">restart_alt</span>
+                    Start Over
+                  </button>
+                )}
                 <button
                   className="prompt-ideas-button"
                   onClick={handleShowPromptIdeas}
@@ -622,20 +633,6 @@ function App() {
                   Prompt Ideas
                 </button>
               </div>
-
-              {/* Start Over Button - appears when image is generated */}
-              {generatedImage && (
-                <div className="start-over-section">
-                  <button
-                    className="start-over-button"
-                    onClick={handleStartOver}
-                    type="button"
-                  >
-                    <span className="material-symbols-outlined">restart_alt</span>
-                    Start Over
-                  </button>
-                </div>
-              )}
 
               {/* Best Practices Section */}
               <div className="best-practices-section">

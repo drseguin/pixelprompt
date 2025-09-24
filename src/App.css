@@ -295,6 +295,38 @@
     'opsz' 18;
 }
 
+/* Inline Start Over Button */
+.start-over-button-inline {
+  background: #8e8e93;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.start-over-button-inline:hover {
+  background: #6d6d7a;
+  transform: translateY(-1px);
+}
+
+.start-over-button-inline .material-symbols-outlined {
+  font-size: 18px;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 18;
+}
+
 /* Drop Zone */
 .drop-zone {
   display: flex;
@@ -441,22 +473,21 @@
 
   .example-prompt-text {
     padding-right: 0;
-    margin-bottom: 8px;
+    margin-bottom: 16px; /* More space for the button */
   }
 
   .example-prompt-container {
-    position: relative;
-    padding-bottom: 52px; /* Make room for button below */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .copy-prompt-button {
-    position: absolute;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: auto;
-    min-width: 80px;
+    position: static;
+    width: 100%;
     justify-content: center;
+    margin-top: 0;
+    align-self: stretch;
   }
 }
 
@@ -510,7 +541,8 @@
   .clear-prompt-button,
   .download-generated-button,
   .undo-button,
-  .start-over-section .start-over-button {
+  .start-over-section .start-over-button,
+  .start-over-button-inline {
     min-height: 44px; /* iOS recommended minimum touch target */
     padding: 12px 16px;
   }
