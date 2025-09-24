@@ -199,8 +199,7 @@
 
 .prompt-actions {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
   margin-top: 16px;
 }
@@ -216,6 +215,10 @@
   cursor: pointer;
   transition: all 0.2s ease;
   letter-spacing: -0.01em;
+  width: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
 }
 
 .generate-button:hover:not(:disabled) {
@@ -242,6 +245,10 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  width: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
 }
 
 .clear-prompt-button:hover {
@@ -388,13 +395,6 @@
     flex-direction: column;
     gap: 8px;
     align-items: stretch;
-  }
-
-  .prompt-ideas-button,
-  .generate-button,
-  .clear-prompt-button {
-    width: 100%;
-    justify-content: center;
   }
 
   .image-actions {
@@ -976,8 +976,10 @@ textarea:focus-visible {
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   white-space: nowrap;
+  width: 100%;
 }
 
 .prompt-ideas-button:hover {

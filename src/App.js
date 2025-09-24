@@ -590,15 +590,6 @@ function App() {
 
               <div className="prompt-actions">
                 <button
-                  className="prompt-ideas-button"
-                  onClick={handleShowPromptIdeas}
-                  type="button"
-                  title="Browse saved prompt ideas"
-                >
-                  <span className="material-symbols-outlined">lightbulb</span>
-                  Prompt Ideas
-                </button>
-                <button
                   className="generate-button"
                   disabled={!promptText.trim() || !isApiReady || isGenerating}
                   onClick={handleGenerate}
@@ -610,6 +601,15 @@ function App() {
                       ? 'Modify Image'
                       : 'Generate Image'
                   }
+                </button>
+                <button
+                  className="prompt-ideas-button"
+                  onClick={handleShowPromptIdeas}
+                  type="button"
+                  title="Browse saved prompt ideas"
+                >
+                  <span className="material-symbols-outlined">lightbulb</span>
+                  Prompt Ideas
                 </button>
                 {promptText.trim() && (
                   <button
