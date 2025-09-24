@@ -51,11 +51,20 @@ function App() {
   const [filterCategory, setFilterCategory] = useState('all');
 
   /**
-   * Loads application settings from backend
+   * Loads application settings and initializes API
    */
   useEffect(() => {
     const loadSettings = async () => {
       try {
+        // First check for React environment variable (Netlify deployment)
+        const reactAppApiKey = process.env.REACT_APP_GEMINI_API_KEY;
+        if (reactAppApiKey) {
+          setApiKeyInput(reactAppApiKey);
+          initializeApi(reactAppApiKey, true);
+          return;
+        }
+
+        // Fallback to backend API for local development
         const response = await fetch('/api/settings');
         if (response.ok) {
           const settingsData = await response.json();
@@ -64,7 +73,7 @@ function App() {
           // Check if API key is already configured
           if (settingsData.nanoBanana?.apiKey) {
             setApiKeyInput(settingsData.nanoBanana.apiKey);
-            initializeApi(settingsData.nanoBanana.apiKey);
+            initializeApi(settingsData.nanoBanana.apiKey, false);
           }
         }
       } catch (error) {
@@ -87,15 +96,18 @@ function App() {
   /**
    * Initialize Nano Banana API with API key
    * @param {string} apiKey - Google AI API key
+   * @param {boolean} fromEnvironment - Whether the key came from React environment variables
    */
-  const initializeApi = useCallback(async (apiKey) => {
+  const initializeApi = useCallback(async (apiKey, fromEnvironment = false) => {
     try {
       nanoBananaApi.initialize(apiKey);
       setIsApiReady(true);
       console.log('Nano Banana API ready');
 
-      // Save the API key to .env file for future use
-      await saveApiKeyToSettings(apiKey);
+      // Only save to backend settings if not from environment variables
+      if (!fromEnvironment) {
+        await saveApiKeyToSettings(apiKey);
+      }
     } catch (error) {
       console.error('Failed to initialize API:', error);
       setIsApiReady(false);
@@ -151,7 +163,7 @@ function App() {
    */
   const handleApiKeySubmit = async () => {
     if (apiKeyInput.trim()) {
-      await initializeApi(apiKeyInput.trim());
+      await initializeApi(apiKeyInput.trim(), false);
     }
   };
 

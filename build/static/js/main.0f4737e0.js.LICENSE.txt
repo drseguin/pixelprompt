@@ -1,0 +1,116 @@
+/**
+ * @license
+ * Copyright 2025 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
+ * @license React
+ * react-dom.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * @license React
+ * react-jsx-runtime.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * @license React
+ * react.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * @license React
+ * scheduler.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * Nano Banana API Service
+ *
+ * @file nanoBananaApi.js
+ * @description Service module for Google's Nano Banana (Gemini 2.5 Flash Image) API integration
+ * @author David Seguin
+ * @version 1.0.0
+ * @license MIT
+ *
+ * Architecture:
+ * - Handles image generation from text prompts
+ * - Supports image editing with uploaded images
+ * - Manages API authentication and requests
+ * - Processes base64 image responses
+ *
+ * Dependencies:
+ * - @google/genai: Google GenAI SDK for Nano Banana API
+ *
+ * Performance Notes:
+ * - Responses cached locally for undo functionality
+ * - Large base64 images handled efficiently
+ * - Error handling with detailed feedback
+ *
+ * Security Considerations:
+ * - API key handled securely
+ * - Input validation for prompts and images
+ * - Safe base64 decoding
+ */
+
+/**
+ * Pixel Prompt Main Application
+ *
+ * @file App.js
+ * @description Main React application component with layout and state management
+ * @author David Seguin
+ * @version 1.0.0
+ * @license MIT
+ *
+ * Architecture:
+ * - Two-panel layout: file upload (left) and preview (right)
+ * - Prompt text area below upload zone
+ * - Settings integration with backend API
+ * - Orange highlight theme implementation
+ *
+ * Security Considerations:
+ * - Input validation for prompt text
+ * - Secure file handling
+ * - XSS prevention measures
+ */
+
+/**
+ * Prompt Analysis Service
+ *
+ * @file promptAnalyzer.js
+ * @description AI-powered prompt analysis service for categorizing and extracting metadata from image generation prompts
+ * @author David Seguin
+ * @version 1.0.0
+ * @license MIT
+ *
+ * Architecture:
+ * - Uses Google Gemini API for intelligent prompt analysis
+ * - Extracts structured metadata: Category, Subject, Action, Environment, Art Style, Lighting
+ * - Provides fallback metadata generation for edge cases
+ * - Integrates with existing nanoBananaApi service
+ *
+ * Security Considerations:
+ * - Input validation for prompt text
+ * - Secure API communication
+ * - Rate limiting awareness
+ */

@@ -185,7 +185,8 @@ promptAnalyzer.analyzePrompt(promptText)
 
 ### Environment Configuration: `.env`
 Primary configuration method using environment variables:
-- **GEMINI_API_KEY**: Google Gemini API key (required for image generation/editing)
+- **REACT_APP_GEMINI_API_KEY**: Google Gemini API key for React app (required for image generation/editing)
+- **GEMINI_API_KEY**: Legacy server-side API key (fallback for local development)
 - **NODE_ENV**: Environment setting (development/production)
 - **PORT**: Server port (default: 3001)
 
@@ -195,7 +196,8 @@ Additional configuration areas:
 - **Development**: Logging, CORS settings
 
 ### API Key Management
-- **Primary**: Environment variable `GEMINI_API_KEY` in `.env` file
+- **Primary**: React environment variable `REACT_APP_GEMINI_API_KEY` (for deployment platforms like Netlify)
+- **Local Development**: Environment variable `GEMINI_API_KEY` in `.env` file
 - **Fallback**: Backend configuration endpoint for runtime key setting
 - **Security**: `.env` file should be excluded from version control
 - All image processing happens client-side for security
