@@ -250,6 +250,44 @@
   box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
 }
 
+/* Start Over Section */
+.start-over-section {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.start-over-section .start-over-button {
+  background: #8e8e93;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  justify-content: center;
+}
+
+.start-over-section .start-over-button:hover {
+  background: #6d6d7a;
+  transform: translateY(-1px);
+}
+
+.start-over-section .start-over-button .material-symbols-outlined {
+  font-size: 18px;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 18;
+}
+
 /* Drop Zone */
 .drop-zone {
   display: flex;
@@ -327,22 +365,165 @@
 
 @media (max-width: 768px) {
   .app-header {
-    padding: 20px 20px;
+    padding: 16px 16px;
   }
 
   .app-title {
-    font-size: 1.8em;
+    font-size: 1.6em;
   }
 
   .app-subtitle {
-    font-size: 1em;
+    font-size: 0.95em;
+  }
+
+  .app-main {
+    padding: 16px 12px;
+  }
+
+  .left-panel, .right-panel {
+    padding: 16px;
   }
 
   .prompt-actions {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .prompt-ideas-button,
+  .generate-button,
+  .clear-prompt-button {
+    width: 100%;
     justify-content: center;
   }
 
-  .generate-button {
+  .image-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .download-generated-button,
+  .undo-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .best-practices-section {
+    margin-top: 16px;
+    padding: 12px 16px;
+  }
+
+  .best-practices-title {
+    font-size: 1em;
+  }
+
+  .practice-item {
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .practice-number {
+    min-width: auto;
+    margin-right: 0;
+  }
+
+  .practice-label {
+    min-width: auto;
+    margin-right: 0;
+    font-weight: 600;
+  }
+
+  .practice-example {
+    margin-left: 16px;
+    font-style: italic;
+  }
+
+  .example-prompt-text {
+    padding-right: 0;
+    margin-bottom: 8px;
+  }
+
+  .copy-prompt-button {
+    position: static;
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-main {
+    padding: 12px 8px;
+  }
+
+  .left-panel, .right-panel {
+    padding: 12px;
+  }
+
+  .app-title {
+    font-size: 1.4em;
+  }
+
+  .prompt-textarea {
+    height: calc(1.5em * 4 + 24px); /* Reduce to 4 lines on very small screens */
+    padding: 12px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .section-title {
+    font-size: 1.1em;
+  }
+
+  .generated-image-header h3 {
+    font-size: 1.1em;
+  }
+
+  .best-practices-title {
+    font-size: 0.95em;
+  }
+
+  .dialog {
+    width: 95%;
+    margin: 16px;
+  }
+
+  .dialog-content {
+    padding: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Better touch targets for mobile */
+  .prompt-ideas-button,
+  .generate-button,
+  .clear-prompt-button,
+  .download-generated-button,
+  .undo-button,
+  .start-over-section .start-over-button {
+    min-height: 44px; /* iOS recommended minimum touch target */
+    padding: 12px 16px;
+  }
+
+  .best-practices-toggle {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .api-key-input,
+  .api-key-submit {
+    min-height: 44px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .api-key-input-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .api-key-submit {
     width: 100%;
   }
 }
@@ -436,16 +617,11 @@
 }
 
 .generated-image-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e5e5e7;
+  margin-bottom: 16px;
 }
 
 .generated-image-header h3 {
-  margin: 0;
+  margin: 0 0 12px 0;
   color: #1d1d1f;
   font-size: 1.3em;
   font-weight: 600;
@@ -454,6 +630,7 @@
 .image-actions {
   display: flex;
   gap: 12px;
+  margin-bottom: 16px;
 }
 
 .undo-button {
@@ -605,15 +782,54 @@
   background: #f7f7f9;
   border: 1px solid #e5e5e7;
   border-radius: 12px;
-  padding: 20px;
+  padding: 16px 20px;
   margin-top: 24px;
 }
 
+.best-practices-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
 .best-practices-title {
-  margin: 0 0 8px 0;
+  margin: 0;
   font-size: 1.1em;
   font-weight: 600;
   color: #F19E39;
+}
+
+.best-practices-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.best-practices-toggle:hover {
+  background: #e5e5e7;
+}
+
+.best-practices-toggle .material-symbols-outlined {
+  font-size: 20px;
+  color: #F19E39;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 20;
+}
+
+.best-practices-content {
+  margin-top: 16px;
+  animation: fadeIn 0.3s ease;
 }
 
 .best-practices-subtitle {
@@ -1176,6 +1392,7 @@ textarea:focus-visible {
   margin-bottom: 12px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

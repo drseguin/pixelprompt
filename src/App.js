@@ -49,6 +49,7 @@ function App() {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [showBestPractices, setShowBestPractices] = useState(false);
 
   /**
    * Loads application settings and initializes API
@@ -355,6 +356,13 @@ function App() {
   };
 
   /**
+   * Toggle best practices section visibility
+   */
+  const toggleBestPractices = () => {
+    setShowBestPractices(!showBestPractices);
+  };
+
+  /**
    * Copy the example prompt to clipboard
    */
   const handleCopyExamplePrompt = async () => {
@@ -591,56 +599,86 @@ function App() {
                 )}
               </div>
 
+              {/* Start Over Button - appears when image is generated */}
+              {generatedImage && (
+                <div className="start-over-section">
+                  <button
+                    className="start-over-button"
+                    onClick={handleStartOver}
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined">restart_alt</span>
+                    Start Over
+                  </button>
+                </div>
+              )}
+
               {/* Best Practices Section */}
               <div className="best-practices-section">
-                <h3 className="best-practices-title">Best Practices for Better Images</h3>
-                <p className="best-practices-subtitle">Include these elements in your prompt:</p>
-
-                <div className="best-practices-list">
-                  <div className="practice-item">
-                    <span className="practice-number">1)</span>
-                    <span className="practice-label">Subject</span>
-                    <span className="practice-example">- A young woman with freckles</span>
-                  </div>
-                  <div className="practice-item">
-                    <span className="practice-number">2)</span>
-                    <span className="practice-label">Action</span>
-                    <span className="practice-example">- smiling thoughtfully, sitting on a sunlit window seat</span>
-                  </div>
-                  <div className="practice-item">
-                    <span className="practice-number">3)</span>
-                    <span className="practice-label">Environment</span>
-                    <span className="practice-example">- in a cozy cafe</span>
-                  </div>
-                  <div className="practice-item">
-                    <span className="practice-number">4)</span>
-                    <span className="practice-label">Art Style</span>
-                    <span className="practice-example">- shot on a Canon 5D Mark IV Camera</span>
-                  </div>
-                  <div className="practice-item">
-                    <span className="practice-number">5)</span>
-                    <span className="practice-label">Lighting</span>
-                    <span className="practice-example">- soft natural light, warm and inviting</span>
-                  </div>
+                <div className="best-practices-header" onClick={toggleBestPractices}>
+                  <h3 className="best-practices-title">Best Practices for Better Images</h3>
+                  <button
+                    className="best-practices-toggle"
+                    type="button"
+                    title={showBestPractices ? "Hide best practices" : "Show best practices"}
+                  >
+                    <span className="material-symbols-outlined">
+                      {showBestPractices ? 'expand_less' : 'expand_more'}
+                    </span>
+                  </button>
                 </div>
 
-                <div className="example-prompt-section">
-                  <h4 className="example-prompt-title">Complete Example:</h4>
-                  <div className="example-prompt-container">
-                    <p className="example-prompt-text">
-                      "A young woman with freckles smiling thoughtfully, sitting on a sunlit window seat in a cozy cafe, shot on a Canon 5D Mark IV Camera, soft natural light, warm and inviting"
-                    </p>
-                    <button
-                      className="copy-prompt-button"
-                      onClick={handleCopyExamplePrompt}
-                      type="button"
-                      title="Copy example prompt"
-                    >
-                      <span className="material-symbols-outlined">content_copy</span>
-                      Copy
-                    </button>
+                {showBestPractices && (
+                  <div className="best-practices-content">
+                    <p className="best-practices-subtitle">Include these elements in your prompt:</p>
+
+                    <div className="best-practices-list">
+                      <div className="practice-item">
+                        <span className="practice-number">1)</span>
+                        <span className="practice-label">Subject</span>
+                        <span className="practice-example">- A young woman with freckles</span>
+                      </div>
+                      <div className="practice-item">
+                        <span className="practice-number">2)</span>
+                        <span className="practice-label">Action</span>
+                        <span className="practice-example">- smiling thoughtfully, sitting on a sunlit window seat</span>
+                      </div>
+                      <div className="practice-item">
+                        <span className="practice-number">3)</span>
+                        <span className="practice-label">Environment</span>
+                        <span className="practice-example">- in a cozy cafe</span>
+                      </div>
+                      <div className="practice-item">
+                        <span className="practice-number">4)</span>
+                        <span className="practice-label">Art Style</span>
+                        <span className="practice-example">- shot on a Canon 5D Mark IV Camera</span>
+                      </div>
+                      <div className="practice-item">
+                        <span className="practice-number">5)</span>
+                        <span className="practice-label">Lighting</span>
+                        <span className="practice-example">- soft natural light, warm and inviting</span>
+                      </div>
+                    </div>
+
+                    <div className="example-prompt-section">
+                      <h4 className="example-prompt-title">Complete Example:</h4>
+                      <div className="example-prompt-container">
+                        <p className="example-prompt-text">
+                          "A young woman with freckles smiling thoughtfully, sitting on a sunlit window seat in a cozy cafe, shot on a Canon 5D Mark IV Camera, soft natural light, warm and inviting"
+                        </p>
+                        <button
+                          className="copy-prompt-button"
+                          onClick={handleCopyExamplePrompt}
+                          type="button"
+                          title="Copy example prompt"
+                        >
+                          <span className="material-symbols-outlined">content_copy</span>
+                          Copy
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -652,32 +690,25 @@ function App() {
               <div className="generated-image-container">
                 <div className="generated-image-header">
                   <h3>Generated Image</h3>
-                  <div className="image-actions">
+                </div>
+                <div className="image-actions">
+                  <button
+                    className="download-generated-button"
+                    onClick={handleDownloadGenerated}
+                    type="button"
+                    title="Download generated image"
+                  >
+                    Download
+                  </button>
+                  {(imageHistory.length > 0 || generatedImage) && (
                     <button
-                      className="download-generated-button"
-                      onClick={handleDownloadGenerated}
-                      type="button"
-                      title="Download generated image"
-                    >
-                      Download
-                    </button>
-                    {(imageHistory.length > 0 || generatedImage) && (
-                      <button
-                        className="undo-button"
-                        onClick={handleUndo}
-                        type="button"
-                      >
-                        Undo
-                      </button>
-                    )}
-                    <button
-                      className="start-over-button"
-                      onClick={handleStartOver}
+                      className="undo-button"
+                      onClick={handleUndo}
                       type="button"
                     >
-                      Start Over
+                      Undo
                     </button>
-                  </div>
+                  )}
                 </div>
                 <div className="generated-image-wrapper">
                   <img
