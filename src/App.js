@@ -21,7 +21,6 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import nanoBananaApi from './services/nanoBananaApi';
-import promptAnalyzer from './services/promptAnalyzer';
 import './App.css';
 
 function App() {
@@ -35,18 +34,8 @@ function App() {
   const fileInputRef = useRef(null);
 
   // Prompt library states
-  const [showSavePromptDialog, setShowSavePromptDialog] = useState(false);
   const [showPromptIdeasDialog, setShowPromptIdeasDialog] = useState(false);
   const [savedPrompts, setSavedPrompts] = useState([]);
-  const [promptMetadata, setPromptMetadata] = useState({
-    name: '',
-    category: '',
-    subject: '',
-    action: '',
-    environment: '',
-    artStyle: '',
-    lighting: ''
-  });
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [showBestPractices, setShowBestPractices] = useState(() => {
@@ -403,79 +392,6 @@ function App() {
     }
   };
 
-  /**
-   * Save current prompt to library
-   */
-  const handleSavePrompt = async () => {
-    if (!generatedImage || !generatedImage.prompt) {
-      alert('No prompt to save. Generate an image first.');
-      return;
-    }
-
-    try {
-      // Analyze the prompt to generate metadata
-      const analyzedMetadata = await promptAnalyzer.analyzePrompt(generatedImage.prompt);
-
-      // Set metadata and show dialog
-      setPromptMetadata({
-        name: `Generated ${new Date().toLocaleDateString()}`,
-        ...analyzedMetadata
-      });
-      setShowSavePromptDialog(true);
-    } catch (error) {
-      console.error('Failed to analyze prompt:', error);
-      // Set fallback metadata
-      setPromptMetadata({
-        name: `Generated ${new Date().toLocaleDateString()}`,
-        category: 'Other',
-        subject: 'General Image',
-        action: 'Static Pose',
-        environment: 'Neutral Background',
-        artStyle: 'Digital Photography',
-        lighting: 'Natural Light'
-      });
-      setShowSavePromptDialog(true);
-    }
-  };
-
-  /**
-   * Save prompt with metadata to backend
-   */
-  const handleSavePromptSubmit = async () => {
-    try {
-      const promptData = {
-        id: Date.now().toString(),
-        name: promptMetadata.name,
-        prompt: generatedImage.prompt,
-        category: promptMetadata.category,
-        subject: promptMetadata.subject,
-        action: promptMetadata.action,
-        environment: promptMetadata.environment,
-        artStyle: promptMetadata.artStyle,
-        lighting: promptMetadata.lighting,
-        createdAt: new Date().toISOString()
-      };
-
-      const response = await fetch('/api/prompts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(promptData),
-      });
-
-      if (response.ok) {
-        console.log('Prompt saved successfully');
-        setShowSavePromptDialog(false);
-        loadSavedPrompts(); // Refresh the list
-      } else {
-        throw new Error('Failed to save prompt');
-      }
-    } catch (error) {
-      console.error('Error saving prompt:', error);
-      alert('Failed to save prompt. Please try again.');
-    }
-  };
 
   /**
    * Load prompt ideas dialog
@@ -656,27 +572,22 @@ function App() {
 
                     <div className="best-practices-list">
                       <div className="practice-item">
-                        <span className="practice-number">1)</span>
                         <span className="practice-label">Subject</span>
                         <span className="practice-example">- A young woman with freckles</span>
                       </div>
                       <div className="practice-item">
-                        <span className="practice-number">2)</span>
                         <span className="practice-label">Action</span>
                         <span className="practice-example">- smiling thoughtfully, sitting on a sunlit window seat</span>
                       </div>
                       <div className="practice-item">
-                        <span className="practice-number">3)</span>
                         <span className="practice-label">Environment</span>
                         <span className="practice-example">- in a cozy cafe</span>
                       </div>
                       <div className="practice-item">
-                        <span className="practice-number">4)</span>
                         <span className="practice-label">Art Style</span>
                         <span className="practice-example">- shot on a Canon 5D Mark IV Camera</span>
                       </div>
                       <div className="practice-item">
-                        <span className="practice-number">5)</span>
                         <span className="practice-label">Lighting</span>
                         <span className="practice-example">- soft natural light, warm and inviting</span>
                       </div>
@@ -747,17 +658,6 @@ function App() {
                   <p className="generation-time">
                     Generated: {new Date(generatedImage.timestamp).toLocaleString()}
                   </p>
-                  <div className="prompt-actions-bottom">
-                    <button
-                      className="save-prompt-button"
-                      onClick={handleSavePrompt}
-                      type="button"
-                      title="Save this prompt to your library"
-                    >
-                      <span className="material-symbols-outlined">bookmark_add</span>
-                      Save Prompt
-                    </button>
-                  </div>
                 </div>
               </div>
             ) : (
@@ -807,141 +707,6 @@ function App() {
         <p>&copy; 2025 David Seguin Consulting Inc. All rights reserved.</p>
       </footer>
 
-      {/* Save Prompt Dialog */}
-      {showSavePromptDialog && (
-        <div className="dialog-overlay" onClick={() => setShowSavePromptDialog(false)}>
-          <div className="dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="dialog-header">
-              <h3>Save Prompt to Library</h3>
-              <button
-                className="dialog-close"
-                onClick={() => setShowSavePromptDialog(false)}
-                type="button"
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-            <div className="dialog-content">
-              <p className="dialog-subtitle">AI has analyzed your prompt and suggested metadata. Feel free to edit:</p>
-
-              <div className="form-group">
-                <label htmlFor="prompt-name">Prompt Name:</label>
-                <input
-                  id="prompt-name"
-                  type="text"
-                  value={promptMetadata.name}
-                  onChange={(e) => setPromptMetadata({...promptMetadata, name: e.target.value})}
-                  placeholder="Enter a name for this prompt"
-                />
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="prompt-category">Category:</label>
-                  <select
-                    id="prompt-category"
-                    value={promptMetadata.category}
-                    onChange={(e) => setPromptMetadata({...promptMetadata, category: e.target.value})}
-                  >
-                    <option value="Portrait">Portrait</option>
-                    <option value="Landscape">Landscape</option>
-                    <option value="Abstract">Abstract</option>
-                    <option value="Architecture">Architecture</option>
-                    <option value="Animal">Animal</option>
-                    <option value="Product">Product</option>
-                    <option value="Fantasy">Fantasy</option>
-                    <option value="Sci-Fi">Sci-Fi</option>
-                    <option value="Food">Food</option>
-                    <option value="Vehicle">Vehicle</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="prompt-subject">Subject:</label>
-                  <input
-                    id="prompt-subject"
-                    type="text"
-                    value={promptMetadata.subject}
-                    onChange={(e) => setPromptMetadata({...promptMetadata, subject: e.target.value})}
-                    placeholder="Main subject"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="prompt-action">Action:</label>
-                  <input
-                    id="prompt-action"
-                    type="text"
-                    value={promptMetadata.action}
-                    onChange={(e) => setPromptMetadata({...promptMetadata, action: e.target.value})}
-                    placeholder="Action or pose"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="prompt-environment">Environment:</label>
-                  <input
-                    id="prompt-environment"
-                    type="text"
-                    value={promptMetadata.environment}
-                    onChange={(e) => setPromptMetadata({...promptMetadata, environment: e.target.value})}
-                    placeholder="Setting or location"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="prompt-artstyle">Art Style:</label>
-                  <input
-                    id="prompt-artstyle"
-                    type="text"
-                    value={promptMetadata.artStyle}
-                    onChange={(e) => setPromptMetadata({...promptMetadata, artStyle: e.target.value})}
-                    placeholder="Photography or art style"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="prompt-lighting">Lighting:</label>
-                  <input
-                    id="prompt-lighting"
-                    type="text"
-                    value={promptMetadata.lighting}
-                    onChange={(e) => setPromptMetadata({...promptMetadata, lighting: e.target.value})}
-                    placeholder="Lighting conditions"
-                  />
-                </div>
-              </div>
-
-              <div className="prompt-preview">
-                <strong>Original Prompt:</strong>
-                <p>"{generatedImage?.prompt}"</p>
-              </div>
-            </div>
-            <div className="dialog-actions">
-              <button
-                className="dialog-button secondary"
-                onClick={() => setShowSavePromptDialog(false)}
-                type="button"
-              >
-                Cancel
-              </button>
-              <button
-                className="dialog-button primary"
-                onClick={handleSavePromptSubmit}
-                type="button"
-                disabled={!promptMetadata.name.trim()}
-              >
-                Save Prompt
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Prompt Ideas Dialog */}
       {showPromptIdeasDialog && (
@@ -995,8 +760,7 @@ function App() {
                 {getFilteredPrompts().length === 0 ? (
                   <div className="no-prompts">
                     <span className="material-symbols-outlined">bookmark_border</span>
-                    <p>No saved prompts found.</p>
-                    <p>Generate some images and save their prompts to build your library!</p>
+                    <p>No prompt ideas available.</p>
                   </div>
                 ) : (
                   getFilteredPrompts().map((prompt) => (
