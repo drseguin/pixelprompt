@@ -10,6 +10,7 @@ This is **pixelprompt**, a simplified React application for testing Google's Gem
 - Google Gemini API integration for image generation and editing
 - Simple prompt-based image modification workflow
 - Docker containerization for easy deployment
+- Netlify-compatible deployment with environment variable configuration
 
 ## Architecture
 
@@ -202,6 +203,18 @@ Additional configuration areas:
 - **Security**: `.env` file should be excluded from version control
 - All image processing happens client-side for security
 
+## Deployment Options
+
+### Netlify Deployment (Recommended for Static Hosting)
+- Uses `REACT_APP_GEMINI_API_KEY` environment variable
+- Fully static deployment, no server required
+- See `NETLIFY_CLOUD.md` for complete deployment guide
+
+### Docker Deployment (Local/Server)
+- Uses shell scripts: `./start.sh`, `./stop.sh`, `./stlog.sh`
+- Includes minimal Express backend for development
+- Suitable for local development and server deployment
+
 ## Testing and Quality
 
 ### Running Tests
@@ -213,6 +226,17 @@ npm test -- --watchAll     # Run tests in watch mode
 
 ### Linting and Code Quality
 The project uses Create React App's built-in ESLint configuration. Code should follow React best practices and JSDoc documentation standards.
+
+### Deployment
+```bash
+# Build for production deployment
+npm run build
+
+# Serve build locally for testing
+npx serve -s build
+```
+
+For Netlify deployment, see `NETLIFY_CLOUD.md` for detailed instructions.
 
 ### Docker Development Workflow
 1. **Initial Setup**: Run `./start.sh` to build and start containers
@@ -278,7 +302,7 @@ The project uses Create React App's built-in ESLint configuration. Code should f
 
 ### Dependencies
 - **Frontend**: React 18, Create React App
-- **Backend**: Express.js (minimal), CORS
+- **Backend**: Express.js (minimal), CORS, Multer
 - **AI Integration**: Google Gemini API (@google/genai)
 - **Development**: Docker, Docker Compose
 
