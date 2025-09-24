@@ -602,15 +602,6 @@ function App() {
                       : 'Generate Image'
                   }
                 </button>
-                <button
-                  className="prompt-ideas-button"
-                  onClick={handleShowPromptIdeas}
-                  type="button"
-                  title="Browse saved prompt ideas"
-                >
-                  <span className="material-symbols-outlined">lightbulb</span>
-                  Prompt Ideas
-                </button>
                 {promptText.trim() && (
                   <button
                     className="clear-prompt-button"
@@ -621,6 +612,15 @@ function App() {
                     Clear
                   </button>
                 )}
+                <button
+                  className="prompt-ideas-button"
+                  onClick={handleShowPromptIdeas}
+                  type="button"
+                  title="Browse saved prompt ideas"
+                >
+                  <span className="material-symbols-outlined">lightbulb</span>
+                  Prompt Ideas
+                </button>
               </div>
 
               {/* Start Over Button - appears when image is generated */}

@@ -444,11 +444,19 @@
     margin-bottom: 8px;
   }
 
+  .example-prompt-container {
+    position: relative;
+    padding-bottom: 52px; /* Make room for button below */
+  }
+
   .copy-prompt-button {
-    position: static;
-    width: 100%;
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    min-width: 80px;
     justify-content: center;
-    margin-top: 8px;
   }
 }
 
