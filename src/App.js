@@ -94,7 +94,7 @@ function App() {
       setIsApiReady(true);
       console.log('Nano Banana API ready');
 
-      // Save the API key to backend settings for future use
+      // Save the API key to .env file for future use
       await saveApiKeyToSettings(apiKey);
     } catch (error) {
       console.error('Failed to initialize API:', error);
@@ -104,45 +104,37 @@ function App() {
   }, []);
 
   /**
-   * Save API key to backend settings
+   * Save API key to .env file
    * @param {string} apiKey - The API key to save
    */
   const saveApiKeyToSettings = async (apiKey) => {
     try {
-      // Get current settings
-      const response = await fetch('/api/settings');
-      let currentSettings = {};
-
-      if (response.ok) {
-        currentSettings = await response.json();
-      }
-
-      // Update the nanoBanana section with the new API key
-      const updatedSettings = {
-        ...currentSettings,
-        nanoBanana: {
-          ...currentSettings.nanoBanana,
-          apiKey: apiKey
-        }
-      };
-
-      // Save updated settings
-      const saveResponse = await fetch('/api/settings', {
+      // Save API key to .env file via new endpoint
+      const response = await fetch('/api/env/apikey', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedSettings),
+        body: JSON.stringify({ apiKey }),
       });
 
-      if (saveResponse.ok) {
-        console.log('API key saved to settings');
-        setSettings(updatedSettings);
+      if (response.ok) {
+        console.log('API key saved to .env file');
+
+        // Update settings state to reflect the change (nanoBanana.apiKey will be populated from env)
+        const settingsResponse = await fetch('/api/settings');
+        if (settingsResponse.ok) {
+          const updatedSettings = await settingsResponse.json();
+          setSettings(updatedSettings);
+        }
       } else {
-        console.warn('Failed to save API key to settings');
+        const errorData = await response.json();
+        console.warn('Failed to save API key:', errorData.error);
+        throw new Error(errorData.error || 'Failed to save API key');
       }
     } catch (error) {
       console.error('Error saving API key:', error);
+      throw error;
     }
   };
 

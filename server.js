@@ -535,6 +535,76 @@ app.delete('/api/prompts/:id', (req, res) => {
   }
 });
 
+// API key management endpoint for .env file
+app.post('/api/env/apikey', (req, res) => {
+  try {
+    const { apiKey } = req.body;
+
+    if (typeof apiKey !== 'string') {
+      return res.status(400).json({ error: 'API key must be a string' });
+    }
+
+    const envPath = path.join(__dirname, 'host.env');
+    let envContent = '';
+
+    // Read existing .env file or create default content
+    if (fs.existsSync(envPath)) {
+      envContent = fs.readFileSync(envPath, 'utf8');
+    } else {
+      envContent = `# Environment Variables for Pixel Prompt
+# Google Gemini API Key
+GEMINI_API_KEY=
+
+# Application Configuration
+NODE_ENV=production
+PORT=3001
+`;
+    }
+
+    // Update or add GEMINI_API_KEY
+    const lines = envContent.split('\n');
+    let apiKeyUpdated = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].startsWith('GEMINI_API_KEY=')) {
+        lines[i] = `GEMINI_API_KEY=${apiKey}`;
+        apiKeyUpdated = true;
+        break;
+      }
+    }
+
+    // If GEMINI_API_KEY wasn't found, add it
+    if (!apiKeyUpdated) {
+      // Find the line with GEMINI_API_KEY= (empty) or add it after the comment
+      let insertIndex = -1;
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i] === 'GEMINI_API_KEY=' || lines[i].includes('Google Gemini API Key')) {
+          insertIndex = i + 1;
+          break;
+        }
+      }
+
+      if (insertIndex > -1) {
+        lines.splice(insertIndex, 0, `GEMINI_API_KEY=${apiKey}`);
+      } else {
+        lines.push(`GEMINI_API_KEY=${apiKey}`);
+      }
+    }
+
+    // Write updated content back to .env
+    fs.writeFileSync(envPath, lines.join('\n'));
+
+    // Update process.env for immediate effect
+    process.env.GEMINI_API_KEY = apiKey;
+
+    console.log('API key saved to host .env file');
+    res.json({ success: true, message: 'API key saved to environment' });
+  } catch (error) {
+    console.error('Error saving API key to .env:', error);
+    res.status(500).json({ error: 'Failed to save API key' });
+  }
+});
+
 // Serve React app for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));

@@ -11,6 +11,8 @@ services:
       - ./uploads:/app/uploads
       # Persistent config directory
       - ./config:/app/config
+      # Mount .env file to allow persistent API key updates
+      - ./.env:/app/host.env
     env_file:
       - .env
     restart: unless-stopped

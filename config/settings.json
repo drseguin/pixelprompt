@@ -52,7 +52,6 @@
     "serveStaticFiles": true
   },
   "nanoBanana": {
-    "apiKey": "AIzaSyCXsjzN10l3fOMlw7hqDry-ZuhXssE-Hnk",
     "model": "gemini-2.5-flash-image-preview",
     "maxImages": 3,
     "supportedFormats": [
