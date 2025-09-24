@@ -49,7 +49,10 @@ function App() {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
-  const [showBestPractices, setShowBestPractices] = useState(false);
+  const [showBestPractices, setShowBestPractices] = useState(() => {
+    // Check if screen is large enough to show best practices by default
+    return window.innerWidth > 768;
+  });
 
   /**
    * Loads application settings and initializes API
@@ -509,6 +512,27 @@ function App() {
   useEffect(() => {
     loadSavedPrompts();
   }, []);
+
+  // Handle screen resize to update best practices visibility
+  useEffect(() => {
+    const handleResize = () => {
+      // Only update if currently collapsed on small screen or expanded on large screen
+      // This prevents overriding user's manual toggle
+      const isLargeScreen = window.innerWidth > 768;
+
+      // Only auto-adjust if the current state matches what we'd expect for the previous screen size
+      if (!showBestPractices && isLargeScreen) {
+        // Screen became large and practices are collapsed - expand them
+        setShowBestPractices(true);
+      } else if (showBestPractices && !isLargeScreen) {
+        // Screen became small and practices are expanded - collapse them
+        setShowBestPractices(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [showBestPractices]);
 
 
   return (
