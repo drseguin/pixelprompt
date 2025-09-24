@@ -471,24 +471,7 @@
     font-style: italic;
   }
 
-  .example-prompt-text {
-    padding-right: 0;
-    margin-bottom: 16px; /* More space for the button */
-  }
-
-  .example-prompt-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .copy-prompt-button {
-    position: static;
-    width: 100%;
-    justify-content: center;
-    margin-top: 0;
-    align-self: stretch;
-  }
+  /* Copy button styling is now handled by the main CSS */
 }
 
 @media (max-width: 480px) {
@@ -926,34 +909,32 @@
   border: 1px solid #e5e5e7;
   border-radius: 8px;
   padding: 12px;
-  position: relative;
+  margin-bottom: 12px;
 }
 
 .example-prompt-text {
-  margin: 0 0 12px 0;
+  margin: 0;
   font-size: 0.9em;
   color: #1d1d1f;
   line-height: 1.4;
   font-style: italic;
-  padding-right: 80px;
 }
 
 .copy-prompt-button {
-  position: absolute;
-  top: 8px;
-  right: 8px;
   background: #F19E39;
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 6px 12px;
+  padding: 8px 16px;
   font-size: 0.8em;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
+  width: 100%;
 }
 
 .copy-prompt-button:hover {

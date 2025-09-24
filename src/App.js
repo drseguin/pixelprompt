@@ -687,16 +687,16 @@ function App() {
                         <p className="example-prompt-text">
                           "A young woman with freckles smiling thoughtfully, sitting on a sunlit window seat in a cozy cafe, shot on a Canon 5D Mark IV Camera, soft natural light, warm and inviting"
                         </p>
-                        <button
-                          className="copy-prompt-button"
-                          onClick={handleCopyExamplePrompt}
-                          type="button"
-                          title="Copy example prompt"
-                        >
-                          <span className="material-symbols-outlined">content_copy</span>
-                          Copy
-                        </button>
                       </div>
+                      <button
+                        className="copy-prompt-button"
+                        onClick={handleCopyExamplePrompt}
+                        type="button"
+                        title="Copy example prompt"
+                      >
+                        <span className="material-symbols-outlined">content_copy</span>
+                        Copy
+                      </button>
                     </div>
                   </div>
                 )}
