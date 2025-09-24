@@ -50,6 +50,8 @@ pixelprompt/
 
 # View real-time logs
 ./stlog.sh
+./stlog.sh -f          # Follow logs in real-time
+./stlog.sh -n 50       # Show last 50 lines
 
 # Stop application
 ./stop.sh
