@@ -19,13 +19,12 @@
  * - XSS prevention measures
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import nanoBananaApi from './services/nanoBananaApi';
 import './App.css';
 
 function App() {
   const [promptText, setPromptText] = useState('');
-  const [, setSettings] = useState(null);
   const [generatedImage, setGeneratedImage] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageHistory, setImageHistory] = useState([]);
@@ -43,6 +42,22 @@ function App() {
   });
 
   /**
+   * Initialize Nano Banana API with API key
+   * @param {string} apiKey - Google AI API key
+   */
+  const initializeApi = (apiKey) => {
+    try {
+      nanoBananaApi.initialize(apiKey);
+      setIsApiReady(true);
+      console.log('Nano Banana API ready');
+    } catch (error) {
+      console.error('Failed to initialize API:', error);
+      setIsApiReady(false);
+      console.error('Failed to initialize Nano Banana API. Please check your API key configuration.');
+    }
+  };
+
+  /**
    * Initialize API with environment variable
    */
   useEffect(() => {
@@ -53,8 +68,7 @@ function App() {
       console.error('No API key found. Please set REACT_APP_GEMINI_API_KEY environment variable.');
       setIsApiReady(false);
     }
-  }, [initializeApi]);
-
+  }, []); // Empty dependency array since we only want this to run once on mount
 
   /**
    * Handles prompt text changes
@@ -63,22 +77,6 @@ function App() {
   const handlePromptChange = (e) => {
     setPromptText(e.target.value);
   };
-
-  /**
-   * Initialize Nano Banana API with API key
-   * @param {string} apiKey - Google AI API key
-   */
-  const initializeApi = useCallback(async (apiKey) => {
-    try {
-      nanoBananaApi.initialize(apiKey);
-      setIsApiReady(true);
-      console.log('Nano Banana API ready');
-    } catch (error) {
-      console.error('Failed to initialize API:', error);
-      setIsApiReady(false);
-      console.error('Failed to initialize Nano Banana API. Please check your API key configuration.');
-    }
-  }, []);
 
 
   /**
