@@ -1,0 +1,20 @@
+[build]
+  command = "npm run build"
+  publish = "build"
+
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "REACT_APP_GEMINI_API_KEY"
+  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIza*"
+
+# Context-specific settings
+[context.production]
+  [context.production.environment]
+    NODE_ENV = "production"
+
+[context.deploy-preview]
+  [context.deploy-preview.environment]
+    NODE_ENV = "production"
+
+[context.branch-deploy]
+  [context.branch-deploy.environment]
+    NODE_ENV = "production"
