@@ -32,16 +32,14 @@ pixelprompt/
 │   └── settings.json            # Application configuration
 ├── public/
 │   └── Prompts.json            # Default prompt library data
-├── uploads/                     # File upload directory (Docker persistent)
+├── uploads/                     # File upload directory (legacy)
 ├── server.js                    # Express backend server (minimal)
 ├── package.json                 # Dependencies and scripts
-├── docker-compose.yml           # Docker Compose configuration
-├── Dockerfile                   # Docker container definition
-├── netlify.toml                 # Netlify deployment configuration
+├── netlify.toml                 # Netlify deployment configuration (secure)
 ├── .env                        # Environment variables (local development)
 ├── DEVELOPMENT_RULES.md        # Comprehensive development standards
 ├── NETLIFY_CLOUD.md            # Netlify deployment guide
-└── Shell scripts: start.sh, stop.sh, stlog.sh, dev.sh
+└── Shell scripts: start.sh, stop.sh, stlog.sh
 ```
 
 ### Key Architectural Patterns
@@ -53,21 +51,7 @@ pixelprompt/
 
 ## Common Development Commands
 
-### Docker-based Development (Recommended)
-```bash
-# Start application (builds and runs containers)
-./start.sh
-
-# View real-time logs
-./stlog.sh
-./stlog.sh -f          # Follow logs in real-time
-./stlog.sh -n 50       # Show last 50 lines
-
-# Stop application
-./stop.sh
-```
-
-### Local Development
+### Local Development (Primary)
 ```bash
 # Install dependencies
 npm install
@@ -83,15 +67,21 @@ npm run build
 
 # Run tests
 npm test
+
+# Run specific test file
+npm test -- --testNamePattern="specific test name"
+
+# Run tests in watch mode
+npm test -- --watchAll
 ```
 
-### Docker Commands
+### Legacy Docker Support
 ```bash
-# Manual Docker operations
-docker compose up -d --build
-docker compose logs -f
-docker compose down
-docker compose down -v  # Remove any persistent data
+# Stop any Docker containers (if previously used)
+./stop.sh
+
+# View logs from Docker containers (if running)
+./stlog.sh
 ```
 
 ## Development Rules (MANDATORY)
@@ -263,16 +253,16 @@ The application includes a sophisticated prompt library system:
 
 ## Deployment Options
 
-### Netlify Deployment (Recommended for Static Hosting)
+### Netlify Deployment (Recommended)
 - Uses `REACT_APP_GEMINI_API_KEY` environment variable
 - Fully static deployment, no server required
-- Requires `netlify.toml` configuration to handle secrets scanning for client-side API keys
+- Secure configuration with comprehensive security headers
 - See `NETLIFY_CLOUD.md` for complete deployment guide
 
-### Docker Deployment (Local/Server)
-- Uses shell scripts: `./start.sh`, `./stop.sh`, `./stlog.sh`
-- Includes minimal Express backend for development
-- Suitable for local development and server deployment
+### Local Development
+- Uses `./start.sh` script for secure environment variable handling
+- Direct React development server (port 3000)
+- No Docker containers required
 
 ## Testing and Quality
 
@@ -292,7 +282,7 @@ The project uses Create React App's built-in ESLint configuration with comprehen
 # Fix linting issues by following the error messages in the console
 ```
 
-### Deployment
+### Production Deployment
 ```bash
 # Build for production deployment
 npm run build
@@ -302,12 +292,6 @@ npx serve -s build
 ```
 
 For Netlify deployment, see `NETLIFY_CLOUD.md` for detailed instructions.
-
-### Docker Development Workflow
-1. **Initial Setup**: Run `./start.sh` to build and start containers
-2. **Development**: Use `./stlog.sh` to monitor real-time logs
-3. **Testing Changes**: Rebuild with `docker compose up -d --build`
-4. **Cleanup**: Run `./stop.sh` to stop containers
 
 ## UI Styling Standards
 
@@ -388,8 +372,7 @@ The application uses a mobile-first responsive design with specific breakpoints:
 
 ### Ports and URLs
 - **Development**: `http://localhost:3000` (React dev server)
-- **Production**: `http://localhost:3001` (Docker container)
-- **Backend API**: Port 3001 (minimal endpoints)
+- **Backend API**: Port 3001 (minimal endpoints, legacy)
 
 ## Security Considerations
 
