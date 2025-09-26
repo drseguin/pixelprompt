@@ -281,7 +281,13 @@ npm test -- --watchAll     # Run tests in watch mode
 ```
 
 ### Linting and Code Quality
-The project uses Create React App's built-in ESLint configuration. Code should follow React best practices and JSDoc documentation standards.
+The project uses Create React App's built-in ESLint configuration with comprehensive TypeScript ESLint rules. Code should follow React best practices and JSDoc documentation standards.
+
+```bash
+# ESLint is integrated into the build process - no separate command needed
+# Linting errors will appear during npm start and npm run build
+# Fix linting issues by following the error messages in the console
+```
 
 ### Deployment
 ```bash
@@ -314,6 +320,14 @@ For Netlify deployment, see `NETLIFY_CLOUD.md` for detailed instructions.
 - **Responsive Design**: Stacks vertically on mobile/tablet (max-width: 1024px)
 - **Panel Styling**: White background, rounded corners, subtle shadows
 - **Prompt Height**: Fixed to 5 lines using `calc(1.5em * 5 + 32px)`
+- **Mobile-Optimized Button Layout**: Icons below prompt use flexbox with wrapping for mobile-friendly side-by-side arrangement
+
+### Responsive CSS Patterns
+The application uses a mobile-first responsive design with specific breakpoints:
+- **Desktop (default)**: Secondary buttons share horizontal space with `flex: 1`
+- **Tablet (768px)**: Secondary buttons use `flex-basis: calc(50% - 4px)` with `min-width: 120px`
+- **Mobile (480px)**: All secondary buttons stack vertically with `flex-basis: 100%`
+- **Generate button**: Always full width with `flex-basis: 100%` across all breakpoints
 
 ## Icon Usage Standards
 
@@ -346,6 +360,7 @@ For Netlify deployment, see `NETLIFY_CLOUD.md` for detailed instructions.
 - **Drop Zone**: `add_photo_alternate` icon in empty state
 - **Loading**: `hourglass_empty` for generating state
 - **Generated**: `flash_on` for ready state
+- **Action Buttons**: `content_copy` (copy), `restart_alt` (start over), `lightbulb` (prompt ideas), `expand_more`/`expand_less` (collapsible sections)
 
 ### Icon Selection Guidelines
 - Choose semantically appropriate icons from Material Symbols
