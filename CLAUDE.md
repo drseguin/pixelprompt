@@ -37,10 +37,11 @@ pixelprompt/
 ├── package.json                 # Dependencies and scripts
 ├── docker-compose.yml           # Docker Compose configuration
 ├── Dockerfile                   # Docker container definition
+├── netlify.toml                 # Netlify deployment configuration
 ├── .env                        # Environment variables (local development)
 ├── DEVELOPMENT_RULES.md        # Comprehensive development standards
 ├── NETLIFY_CLOUD.md            # Netlify deployment guide
-└── Shell scripts: start.sh, stop.sh, stlog.sh
+└── Shell scripts: start.sh, stop.sh, stlog.sh, dev.sh
 ```
 
 ### Key Architectural Patterns
@@ -71,7 +72,10 @@ pixelprompt/
 # Install dependencies
 npm install
 
-# Start React development server (frontend only)
+# Recommended: Start React development server with proper environment variables
+./dev.sh
+
+# Alternative: Start React development server manually (may have env var issues)
 npm start
 
 # Build for production
@@ -218,9 +222,10 @@ promptAnalyzer.analyzePrompt(promptText)
 ### Environment Configuration: `.env`
 Primary configuration method using environment variables:
 - **REACT_APP_GEMINI_API_KEY**: Google Gemini API key for React app (required for image generation/editing)
-- **GEMINI_API_KEY**: Legacy server-side API key (fallback for local development)
 - **NODE_ENV**: Environment setting (development/production)
 - **PORT**: Server port (default: 3001)
+
+**Important**: React Create App sometimes has issues loading `.env` files. Use `./dev.sh` for reliable local development.
 
 ### Legacy Configuration: `config/settings.json`
 Additional configuration areas:
@@ -229,10 +234,10 @@ Additional configuration areas:
 
 ### API Key Management
 - **Primary**: React environment variable `REACT_APP_GEMINI_API_KEY` (for deployment platforms like Netlify)
-- **Local Development**: Environment variable `GEMINI_API_KEY` in `.env` file
-- **Fallback**: Backend configuration endpoint for runtime key setting
+- **Local Development**: Environment variable `REACT_APP_GEMINI_API_KEY` in `.env` file (use `./dev.sh` for reliable loading)
 - **Security**: `.env` file should be excluded from version control
 - All image processing happens client-side for security
+- **Netlify**: Requires `netlify.toml` configuration to bypass secrets scanning for client-side API keys
 
 ## Prompt Library System
 
@@ -264,6 +269,7 @@ The application includes a sophisticated prompt library system:
 ### Netlify Deployment (Recommended for Static Hosting)
 - Uses `REACT_APP_GEMINI_API_KEY` environment variable
 - Fully static deployment, no server required
+- Requires `netlify.toml` configuration to handle secrets scanning for client-side API keys
 - See `NETLIFY_CLOUD.md` for complete deployment guide
 
 ### Docker Deployment (Local/Server)
@@ -408,7 +414,25 @@ The application uses a mobile-first responsive design with specific breakpoints:
 ### Key Integration Files
 - **`config/settings.json`**: Application configuration schema
 - **`.env`**: Local environment variables template
+- **`netlify.toml`**: Netlify deployment configuration with secrets scanning settings
 - **`docker-compose.yml`**: Container orchestration with volume mounting
-- **Shell scripts**: `start.sh`, `stop.sh`, `stlog.sh` for Docker workflow management
+- **Shell scripts**: `start.sh`, `stop.sh`, `stlog.sh`, `dev.sh` for development workflow management
+
+## Common Issues and Solutions
+
+### Environment Variable Loading
+- **Problem**: "API Key Not Configured" error when running locally
+- **Solution**: Use `./dev.sh` instead of `npm start` for reliable environment variable loading
+- **Root Cause**: React Create App sometimes fails to load `.env` files properly
+
+### Netlify Deployment Issues
+- **Problem**: Netlify build fails with "secrets scanning detected secrets in build"
+- **Solution**: Ensure `netlify.toml` includes proper secrets scanning configuration
+- **Environment Variable**: Must be named `REACT_APP_GEMINI_API_KEY` (not `GEMINI_API`)
+
+### Docker Port Conflicts
+- **Problem**: "Address already in use" when starting Docker containers
+- **Solution**: `./start.sh` automatically detects and restarts existing containers
+- **Manual**: Use `docker compose down` then `./start.sh`
 
 **Note**: Always consult `DEVELOPMENT_RULES.md` before making code changes - it contains mandatory standards that override default practices.
