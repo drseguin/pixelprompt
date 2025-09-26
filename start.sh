@@ -1,79 +1,65 @@
 #!/bin/bash
 
-# Pixel Prompt Application Startup Script
+# Pixel Prompt Application Start Script
 #
-# Description: Starts the Pixel Prompt application using Docker Compose
+# Description: Starts the React development server with secure environment variable handling
 # Author: David Seguin
-# Version: 1.0.0
+# Version: 2.0.0
 
 set -e
 
 echo "🚀 Starting Pixel Prompt Application..."
 
-# Check if Docker is running
-if ! docker info > /dev/null 2>&1; then
-    echo "❌ Error: Docker is not running. Please start Docker first."
-    exit 1
+# Check if node_modules exists
+if [ ! -d "node_modules" ]; then
+    echo "📦 Installing dependencies..."
+    npm install
 fi
 
-# Check if docker-compose.yml exists
-if [ ! -f "docker-compose.yml" ]; then
-    echo "❌ Error: docker-compose.yml not found in current directory"
-    exit 1
-fi
-
-# Create necessary directories if they don't exist
-echo "📁 Creating necessary directories..."
-mkdir -p uploads config
-
-# Ensure uploads directory has a .gitkeep file
-if [ ! -f "uploads/.gitkeep" ]; then
-    touch uploads/.gitkeep
-fi
-
-# Check if containers are already running
-if docker compose ps | grep -q "pixelprompt-app.*Up"; then
-    echo "🔄 Application is already running. Restarting..."
-    docker compose down
-    echo "⏳ Waiting for containers to stop..."
-    sleep 3
-fi
-
-# Start the application with Docker Compose
-echo "🔧 Building and starting containers..."
-docker compose up -d --build
-
-# Wait a moment for the container to start
-echo "⏳ Waiting for application to start..."
-sleep 5
-
-# Check if the container is running
-if docker compose ps | grep -q "pixelprompt-app.*Up"; then
-    echo "✅ Pixel Prompt application started successfully!"
-    echo ""
-    echo "📊 Application Details:"
-    echo "   URL: http://localhost:3001"
-    echo "   Container: pixelprompt-app"
-    echo "   Status: Running"
-    echo ""
-    echo "🔍 Useful commands:"
-    echo "   View logs:    ./stlog.sh"
-    echo "   Stop app:     ./stop.sh"
-    echo "   Check status: docker compose ps"
-    echo ""
-    echo "🌐 Opening application in browser..."
-
-    # Try to open the application in the default browser (macOS/Linux)
-    if command -v open > /dev/null; then
-        open http://localhost:3001
-    elif command -v xdg-open > /dev/null; then
-        xdg-open http://localhost:3001
-    else
-        echo "Please open http://localhost:3001 in your browser"
-    fi
+# Load environment variables from .env file
+if [ -f ".env" ]; then
+    echo "📄 Loading environment variables from .env..."
+    # Use a more robust method to load environment variables
+    set -a
+    source .env
+    set +a
 else
-    echo "❌ Failed to start Pixel Prompt application"
-    echo "🔍 Checking logs for errors..."
-    docker compose logs
+    echo "⚠️  Warning: .env file not found"
+fi
+
+# Check if API key is set
+if [ -z "$REACT_APP_GEMINI_API_KEY" ]; then
+    echo "❌ Error: REACT_APP_GEMINI_API_KEY not found"
+    echo ""
+    echo "To fix this issue:"
+    echo "1. Create a .env file in the project root"
+    echo "2. Add your API key: REACT_APP_GEMINI_API_KEY=your_api_key_here"
+    echo "3. Get your API key from: https://aistudio.google.com/app/apikey"
+    echo ""
+    echo "Example .env file content:"
+    echo "REACT_APP_GEMINI_API_KEY=AIzaSy..."
+    echo "NODE_ENV=development"
+    echo "PORT=3001"
     exit 1
 fi
+
+# Validate API key format (basic check)
+if [[ ! "$REACT_APP_GEMINI_API_KEY" =~ ^AIza[0-9A-Za-z_-]{35}$ ]]; then
+    echo "⚠️  Warning: API key format appears invalid"
+    echo "Google API keys should start with 'AIza' and be 39 characters long"
+    echo "Current key: ${REACT_APP_GEMINI_API_KEY:0:10}..."
+fi
+
+echo "✅ API key loaded successfully"
+echo "🔐 API key: ${REACT_APP_GEMINI_API_KEY:0:10}...${REACT_APP_GEMINI_API_KEY: -4}"
+echo "🌐 Starting React development server on port 3000..."
+echo ""
+echo "📊 Development Details:"
+echo "   URL: http://localhost:3000"
+echo "   Mode: Development"
+echo "   Hot Reload: Enabled"
+echo "   Environment: Local Development"
+echo ""
+
+# Start the React development server with explicit environment variable
+REACT_APP_GEMINI_API_KEY="$REACT_APP_GEMINI_API_KEY" PORT=3000 npm start

@@ -103,7 +103,7 @@ function App() {
         console.error('🔧 Local Development Setup:');
         console.error('1. Create a .env file in the project root');
         console.error('2. Add: REACT_APP_GEMINI_API_KEY=your_api_key_here');
-        console.error('3. Restart development server using: ./dev.sh');
+        console.error('3. Restart development server using: ./start.sh');
         console.error('4. Get your API key from: https://aistudio.google.com/app/apikey');
       } else if (environment === 'netlify') {
         console.error('🌐 Netlify Deployment Setup:');
@@ -470,7 +470,7 @@ function App() {
                       <ol>
                         <li>Create a <code>.env</code> file in the project root</li>
                         <li>Add your API key: <code>REACT_APP_GEMINI_API_KEY=your_api_key_here</code></li>
-                        <li>Restart the development server using: <code>./dev.sh</code></li>
+                        <li>Restart the development server using: <code>./start.sh</code></li>
                       </ol>
                     </div>
                   );

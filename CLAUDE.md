@@ -72,8 +72,8 @@ pixelprompt/
 # Install dependencies
 npm install
 
-# Recommended: Start React development server with proper environment variables
-./dev.sh
+# Start React development server with secure environment variable handling
+./start.sh
 
 # Alternative: Start React development server manually (may have env var issues)
 npm start
@@ -83,9 +83,6 @@ npm run build
 
 # Run tests
 npm test
-
-# Start backend server separately (port 3001)
-node server.js
 ```
 
 ### Docker Commands
@@ -422,9 +419,9 @@ The application uses a mobile-first responsive design with specific breakpoints:
 
 ### Environment Variable Loading
 - **Problem**: "API Key Not Configured" error when running locally
-- **Solution**: Use `./dev.sh` instead of `npm start` for reliable environment variable loading
+- **Solution**: Use `./start.sh` instead of `npm start` for reliable environment variable loading
 - **Root Cause**: React Create App sometimes fails to load `.env` files properly
-- **Enhanced Fix**: Improved `dev.sh` script with better error messages and API key validation
+- **Enhanced Fix**: Improved `start.sh` script with better error messages and API key validation
 
 ### Netlify Deployment Issues
 - **Problem**: Netlify build fails with "secrets scanning detected secrets in build"

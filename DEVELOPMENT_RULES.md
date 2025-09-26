@@ -285,7 +285,7 @@ Before committing any changes, verify:
 **RULE: All deployments must follow secure configuration practices**
 
 **Local Development Security:**
-- Use `./dev.sh` script for reliable environment variable loading
+- Use `./start.sh` script for reliable environment variable loading
 - Never commit `.env` files or API keys to version control
 - Validate API key format during startup
 - Provide environment-specific error messages and setup instructions
