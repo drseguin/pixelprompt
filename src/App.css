@@ -649,11 +649,11 @@
 
   /* Show icons only on mobile for compact layout */
   .button-text {
-    display: none;
+    display: none !important;
   }
 
   .button-icon {
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     font-size: 20px;
@@ -1101,12 +1101,14 @@ textarea:focus-visible {
 }
 
 /* Desktop button display (show text, hide icons) */
-.button-text {
-  display: inline;
-}
+@media (min-width: 481px) {
+  .button-text {
+    display: inline !important;
+  }
 
-.button-icon {
-  display: none;
+  .button-icon {
+    display: none !important;
+  }
 }
 
 /* Subtle animations */
