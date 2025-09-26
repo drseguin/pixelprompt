@@ -592,6 +592,14 @@
     grid-template-columns: 1fr;
   }
 
+  /* On very small screens, stack all buttons */
+  .prompt-actions .clear-prompt-button,
+  .prompt-actions .start-over-button-inline,
+  .prompt-actions .prompt-ideas-button {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
   /* Better touch targets for mobile */
   .prompt-ideas-button,
   .generate-button,
