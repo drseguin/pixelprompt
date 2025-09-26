@@ -377,6 +377,27 @@ function App() {
   };
 
   /**
+   * Copy the current prompt text to clipboard
+   */
+  const handleCopyPrompt = async () => {
+    if (!promptText.trim()) return;
+
+    try {
+      await navigator.clipboard.writeText(promptText);
+      console.log('Prompt copied to clipboard');
+    } catch (error) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = promptText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      console.log('Prompt copied to clipboard (fallback)');
+    }
+  };
+
+  /**
    * Load saved prompts from backend
    */
   const loadSavedPrompts = async () => {
@@ -495,15 +516,27 @@ function App() {
           <div className="left-panel">
             <div className="prompt-section">
               <h2 className="section-title">Prompt</h2>
-              <textarea
-                className="prompt-textarea"
-                value={promptText}
-                onChange={handlePromptChange}
-                placeholder={generatedImage
-                  ? "Describe how to modify the current image..."
-                  : "Describe what you want to generate..."}
-                rows={5}
-              />
+              <div className="prompt-textarea-container">
+                <textarea
+                  className="prompt-textarea"
+                  value={promptText}
+                  onChange={handlePromptChange}
+                  placeholder={generatedImage
+                    ? "Describe how to modify the current image..."
+                    : "Describe what you want to generate..."}
+                  rows={5}
+                />
+                {promptText.trim() && (
+                  <button
+                    className="copy-prompt-text-button"
+                    onClick={handleCopyPrompt}
+                    type="button"
+                    title="Copy prompt to clipboard"
+                  >
+                    <span className="material-symbols-outlined">content_copy</span>
+                  </button>
+                )}
+              </div>
 
               <div className="prompt-actions">
                 <button

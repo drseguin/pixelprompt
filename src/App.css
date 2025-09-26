@@ -170,19 +170,25 @@
 }
 
 /* Prompt Section */
+.prompt-textarea-container {
+  position: relative;
+  margin-bottom: 16px;
+}
+
 .prompt-section .prompt-textarea {
   width: 100%;
   height: calc(1.5em * 5 + 32px); /* 5 lines at 1.5 line-height + padding */
   border: 1px solid #e5e5e7;
   border-radius: 12px;
   padding: 16px;
+  padding-right: 50px; /* Make room for copy button */
   font-size: 1em;
   font-family: inherit;
   resize: vertical;
   transition: all 0.2s ease;
   background: #fafafa;
   line-height: 1.5;
-  margin-bottom: 16px;
+  box-sizing: border-box;
 }
 
 .prompt-textarea:focus {
@@ -196,6 +202,50 @@
   color: #8e8e93;
   font-style: normal;
 }
+
+.copy-prompt-text-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: 1px solid #e5e5e7;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #F19E39;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.copy-prompt-text-button:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #F19E39;
+  box-shadow: 0 2px 8px rgba(241, 158, 57, 0.15);
+  transform: translateY(-1px);
+}
+
+.copy-prompt-text-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(241, 158, 57, 0.2);
+}
+
+.copy-prompt-text-button .material-symbols-outlined {
+  color: #F19E39;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
 
 .prompt-actions {
   display: flex;
@@ -427,6 +477,18 @@
     flex-direction: column;
     gap: 8px;
     align-items: stretch;
+  }
+
+  .prompt-textarea {
+    padding-right: 42px; /* Smaller right padding for mobile */
+  }
+
+  .copy-prompt-text-button {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    top: 6px;
+    right: 6px;
   }
 
   .image-actions {
