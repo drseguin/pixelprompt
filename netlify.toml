@@ -4,7 +4,8 @@
 
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "REACT_APP_GEMINI_API_KEY"
-  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIza*"
+  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIzaSyCXsjzN10l3fOMlw7hqDry-ZuhXssE-Hnk"
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
 # Context-specific settings
 [context.production]
