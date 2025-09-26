@@ -503,17 +503,32 @@
     right: 6px;
   }
 
+  /* Force side-by-side layout for image action buttons */
   .image-actions {
-    flex-direction: row;
-    gap: 8px;
-    flex-wrap: wrap;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
   }
 
-  .download-generated-button,
-  .undo-button {
-    flex: 1;
-    min-width: calc(50% - 4px);
-    justify-content: center;
+  /* Force buttons to share horizontal space */
+  .image-actions > .download-generated-button,
+  .image-actions > .undo-button {
+    flex: 1 1 0 !important;
+    width: calc(50% - 4px) !important;
+    min-width: 0 !important;
+    max-width: calc(50% - 4px) !important;
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* When only one button is present */
+  .image-actions > .download-generated-button:only-child {
+    flex: 1 1 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .best-practices-section {
@@ -548,6 +563,22 @@
   }
 
   /* Copy button styling is now handled by the main CSS */
+}
+
+/* Additional mobile-specific rules for button layout */
+@media (max-width: 900px) {
+  .image-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .image-actions > button {
+    flex: 1 1 0 !important;
+    width: calc(50% - 4px) !important;
+    max-width: calc(50% - 4px) !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -755,6 +786,7 @@
 
 .image-actions {
   display: flex;
+  flex-direction: row;
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -1607,5 +1639,41 @@ textarea:focus-visible {
   .form-row {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+}
+
+/* CRITICAL: Final override for mobile button layout - highest specificity */
+@media screen and (max-width: 1200px) {
+  .generated-image-container .image-actions,
+  .right-panel .image-actions,
+  div.image-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+  }
+
+  .generated-image-container .image-actions > button,
+  .right-panel .image-actions > button,
+  div.image-actions > button {
+    flex: 1 1 calc(50% - 4px) !important;
+    width: calc(50% - 4px) !important;
+    min-width: calc(50% - 4px) !important;
+    max-width: calc(50% - 4px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+  }
+}
+
+/* Even more aggressive mobile override */
+@media screen and (max-width: 600px) {
+  .image-actions > * {
+    flex: 1 1 50% !important;
+    width: 50% !important;
+    max-width: 50% !important;
   }
 }
