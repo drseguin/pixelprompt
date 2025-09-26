@@ -561,7 +561,8 @@ function App() {
                     type="button"
                     title="Clear prompt"
                   >
-                    Clear
+                    <span className="button-icon material-symbols-outlined">clear</span>
+                    <span className="button-text">Clear</span>
                   </button>
                 )}
                 {/* Start Over Button - appears when image is generated */}
@@ -571,8 +572,8 @@ function App() {
                     onClick={handleStartOver}
                     type="button"
                   >
-                    <span className="material-symbols-outlined">restart_alt</span>
-                    Start Over
+                    <span className="button-icon material-symbols-outlined">restart_alt</span>
+                    <span className="button-text">Start Over</span>
                   </button>
                 )}
                 <button
@@ -581,8 +582,8 @@ function App() {
                   type="button"
                   title="Browse saved prompt ideas"
                 >
-                  <span className="material-symbols-outlined">lightbulb</span>
-                  Prompt Ideas
+                  <span className="button-icon material-symbols-outlined">lightbulb</span>
+                  <span className="button-text">Prompt Ideas</span>
                 </button>
               </div>
 
@@ -666,7 +667,8 @@ function App() {
                     type="button"
                     title="Download generated image"
                   >
-                    Download
+                    <span className="button-icon material-symbols-outlined">download</span>
+                    <span className="button-text">Download</span>
                   </button>
                   {(imageHistory.length > 0 || generatedImage) && (
                     <button
@@ -674,7 +676,8 @@ function App() {
                       onClick={handleUndo}
                       type="button"
                     >
-                      Undo
+                      <span className="button-icon material-symbols-outlined">undo</span>
+                      <span className="button-text">Undo</span>
                     </button>
                   )}
                 </div>
