@@ -93,24 +93,3 @@
  * - Secure file handling
  * - XSS prevention measures
  */
-
-/**
- * Prompt Analysis Service
- *
- * @file promptAnalyzer.js
- * @description AI-powered prompt analysis service for categorizing and extracting metadata from image generation prompts
- * @author David Seguin
- * @version 1.0.0
- * @license MIT
- *
- * Architecture:
- * - Uses Google Gemini API for intelligent prompt analysis
- * - Extracts structured metadata: Category, Subject, Action, Environment, Art Style, Lighting
- * - Provides fallback metadata generation for edge cases
- * - Integrates with existing nanoBananaApi service
- *
- * Security Considerations:
- * - Input validation for prompt text
- * - Secure API communication
- * - Rate limiting awareness
- */

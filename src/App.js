@@ -58,14 +58,66 @@ function App() {
   };
 
   /**
-   * Initialize API with environment variable
+   * Detect deployment environment for debugging
+   * @returns {string} Environment identifier
+   */
+  const getEnvironmentInfo = () => {
+    const hostname = window.location.hostname;
+    const isNetlify = hostname.includes('.netlify.app') || hostname.includes('.netlify.com');
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+
+    if (isNetlify) return 'netlify';
+    if (isLocalhost) return 'local';
+    return 'custom';
+  };
+
+  /**
+   * Initialize API with environment variable and provide detailed feedback
    */
   useEffect(() => {
     const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+    const environment = getEnvironmentInfo();
+
+    console.log(`🔍 Environment Detection: ${environment}`);
+    console.log(`🔐 API Key Status: ${apiKey ? 'Present' : 'Missing'}`);
+
     if (apiKey) {
-      initializeApi(apiKey);
+      // Validate API key format
+      const isValidFormat = /^AIza[0-9A-Za-z_-]{35}$/.test(apiKey);
+      if (!isValidFormat) {
+        console.warn('⚠️ API key format appears invalid. Expected format: AIza[35 characters]');
+      }
+
+      try {
+        initializeApi(apiKey);
+        console.log(`✅ API initialized successfully in ${environment} environment`);
+      } catch (error) {
+        console.error(`❌ API initialization failed in ${environment} environment:`, error);
+        setIsApiReady(false);
+      }
     } else {
-      console.error('No API key found. Please set REACT_APP_GEMINI_API_KEY environment variable.');
+      console.error(`❌ No API key found in ${environment} environment`);
+
+      // Provide environment-specific guidance
+      if (environment === 'local') {
+        console.error('🔧 Local Development Setup:');
+        console.error('1. Create a .env file in the project root');
+        console.error('2. Add: REACT_APP_GEMINI_API_KEY=your_api_key_here');
+        console.error('3. Restart development server using: ./dev.sh');
+        console.error('4. Get your API key from: https://aistudio.google.com/app/apikey');
+      } else if (environment === 'netlify') {
+        console.error('🌐 Netlify Deployment Setup:');
+        console.error('1. Go to Netlify dashboard > Site settings > Environment variables');
+        console.error('2. Add variable: REACT_APP_GEMINI_API_KEY');
+        console.error('3. Set value to your Google Gemini API key');
+        console.error('4. Trigger a new deployment');
+      } else {
+        console.error('🔧 Custom Deployment Setup:');
+        console.error('1. Set environment variable: REACT_APP_GEMINI_API_KEY');
+        console.error('2. Ensure the variable is available during build process');
+        console.error('3. Rebuild and redeploy the application');
+      }
+
       setIsApiReady(false);
     }
   }, []); // Empty dependency array since we only want this to run once on mount
@@ -405,11 +457,59 @@ function App() {
         {!isApiReady && (
           <div className="api-key-section">
             <div className="api-key-error">
-              <h3>API Key Not Configured</h3>
-              <p>Please set the <code>REACT_APP_GEMINI_API_KEY</code> environment variable.</p>
-              <p>
-                Get your API key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
-              </p>
+              <h3>🔐 API Key Not Configured</h3>
+              <p>The Google Gemini API key is required for image generation and editing.</p>
+
+              {(() => {
+                const environment = getEnvironmentInfo();
+
+                if (environment === 'local') {
+                  return (
+                    <div className="setup-instructions">
+                      <h4>🔧 Local Development Setup:</h4>
+                      <ol>
+                        <li>Create a <code>.env</code> file in the project root</li>
+                        <li>Add your API key: <code>REACT_APP_GEMINI_API_KEY=your_api_key_here</code></li>
+                        <li>Restart the development server using: <code>./dev.sh</code></li>
+                      </ol>
+                    </div>
+                  );
+                } else if (environment === 'netlify') {
+                  return (
+                    <div className="setup-instructions">
+                      <h4>🌐 Netlify Deployment Setup:</h4>
+                      <ol>
+                        <li>Go to your Netlify dashboard</li>
+                        <li>Navigate to: Site settings → Environment variables</li>
+                        <li>Add variable: <code>REACT_APP_GEMINI_API_KEY</code></li>
+                        <li>Set the value to your Google Gemini API key</li>
+                        <li>Trigger a new deployment</li>
+                      </ol>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className="setup-instructions">
+                      <h4>🔧 Environment Setup:</h4>
+                      <ol>
+                        <li>Set the environment variable: <code>REACT_APP_GEMINI_API_KEY</code></li>
+                        <li>Ensure the variable is available during the build process</li>
+                        <li>Rebuild and redeploy the application</li>
+                      </ol>
+                    </div>
+                  );
+                }
+              })()}
+
+              <div className="api-key-help">
+                <p>
+                  📝 Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
+                </p>
+                <p className="security-note">
+                  🔒 <strong>Security Note:</strong> API keys are embedded in the client-side build for Google Gemini.
+                  Configure domain restrictions in Google Cloud Console for additional security.
+                </p>
+              </div>
             </div>
           </div>
         )}

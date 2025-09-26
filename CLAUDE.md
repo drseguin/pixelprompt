@@ -424,15 +424,24 @@ The application uses a mobile-first responsive design with specific breakpoints:
 - **Problem**: "API Key Not Configured" error when running locally
 - **Solution**: Use `./dev.sh` instead of `npm start` for reliable environment variable loading
 - **Root Cause**: React Create App sometimes fails to load `.env` files properly
+- **Enhanced Fix**: Improved `dev.sh` script with better error messages and API key validation
 
 ### Netlify Deployment Issues
 - **Problem**: Netlify build fails with "secrets scanning detected secrets in build"
-- **Solution**: Ensure `netlify.toml` includes proper secrets scanning configuration
+- **Solution**: **SECURE APPROACH** - Remove all secrets scanning bypass configurations
 - **Environment Variable**: Must be named `REACT_APP_GEMINI_API_KEY` (not `GEMINI_API`)
+- **New Configuration**: Enhanced `netlify.toml` with security headers and CSP
+- **Security**: Use domain restrictions in Google Cloud Console instead of bypassing security
 
 ### Docker Port Conflicts
 - **Problem**: "Address already in use" when starting Docker containers
 - **Solution**: `./start.sh` automatically detects and restarts existing containers
 - **Manual**: Use `docker compose down` then `./start.sh`
+
+### API Key Security Best Practices
+- **Client-Side Exposure**: Google Gemini API keys are designed for client-side use
+- **Domain Restrictions**: Configure domain allowlists in Google Cloud Console
+- **Environment Detection**: Application automatically detects deployment environment
+- **User-Friendly Errors**: Context-aware setup instructions for different environments
 
 **Note**: Always consult `DEVELOPMENT_RULES.md` before making code changes - it contains mandatory standards that override default practices.

@@ -1,21 +1,89 @@
+# Netlify Configuration for PixelPrompt
+# Secure deployment configuration for React application with Google Gemini API integration
+
 [build]
   command = "npm run build"
   publish = "build"
+  # Build timeout increased for large dependencies
+  timeout = 10
 
 [build.environment]
-  SECRETS_SCAN_OMIT_KEYS = "REACT_APP_GEMINI_API_KEY"
-  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIzaSyCXsjzN10l3fOMlw7hqDry-ZuhXssE-Hnk"
-  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
+  # Node.js version specification for consistent builds
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
+  # Production build optimizations
+  GENERATE_SOURCEMAP = "false"
+  CI = "true"
 
-# Context-specific settings
+# Production deployment settings
 [context.production]
   [context.production.environment]
     NODE_ENV = "production"
+    # Enable production optimizations
+    REACT_APP_ENVIRONMENT = "production"
 
+# Deploy preview settings (for pull requests)
 [context.deploy-preview]
   [context.deploy-preview.environment]
     NODE_ENV = "production"
+    REACT_APP_ENVIRONMENT = "preview"
 
+# Branch deploy settings
 [context.branch-deploy]
   [context.branch-deploy.environment]
     NODE_ENV = "production"
+    REACT_APP_ENVIRONMENT = "development"
+
+# Single Page Application routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers for enhanced protection
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Content Security Policy
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://generativelanguage.googleapis.com https://ai.google.dev; media-src 'self' data: blob:;"
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Cache optimization for static assets
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache control for service worker and manifest
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# API endpoint for health checks
+[[redirects]]
+  from = "/api/health"
+  to = "/.netlify/functions/health"
+  status = 200
+
+# Environment-specific redirects for development
+[[redirects]]
+  from = "/api/*"
+  to = "https://localhost:3001/api/:splat"
+  status = 200
+  condition = "Role=admin"
+
+# Edge functions for enhanced security (if needed)
+[[edge_functions]]
+  function = "geo-location"
+  path = "/api/*"

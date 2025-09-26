@@ -161,18 +161,24 @@ When any code changes affect settings in `rtt_config.json` or `defaults.json`, y
 **RULE: Any security-related changes must update security documentation**
 
 **Security-sensitive areas:**
-- API key management
-- Encryption/decryption
-- File system access
-- Network communications
-- User input validation
-- Audio data handling
+- API key management and environment variable handling
+- Client-side API key exposure (Google Gemini)
+- Domain restrictions and access controls
+- Content Security Policy (CSP) configuration
+- Security headers implementation
+- Network communications and CORS
+- User input validation and XSS prevention
+- File upload and processing security
 
 **Must document:**
-- Security implications
-- Data protection measures
-- Air-gapped environment considerations
-- Compliance requirements
+- Security implications and threat mitigation
+- Data protection measures and encryption
+- Environment-specific security configurations
+- Domain restriction setup in Google Cloud Console
+- CSP policy justifications and allowed domains
+- Security header configurations and purposes
+- API key rotation procedures
+- Deployment security checklist
 
 ## 📋 AUTOMATED CHECKS AND BEST PRACTICES
 
@@ -274,6 +280,41 @@ Before committing any changes, verify:
 - Mixed icon libraries within the application
 - Inconsistent sizing or styling
 - Icons without accessibility considerations
+
+### Secure Deployment Standards
+**RULE: All deployments must follow secure configuration practices**
+
+**Local Development Security:**
+- Use `./dev.sh` script for reliable environment variable loading
+- Never commit `.env` files or API keys to version control
+- Validate API key format during startup
+- Provide environment-specific error messages and setup instructions
+
+**Netlify Deployment Security:**
+- **NEVER** bypass Netlify's security scanning
+- Use environment variables exclusively for API key configuration
+- Implement comprehensive Content Security Policy (CSP)
+- Configure security headers (X-Frame-Options, X-XSS-Protection, etc.)
+- Disable source maps in production builds
+- Use domain restrictions for API keys in Google Cloud Console
+
+**Required Security Headers:**
+```toml
+Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://generativelanguage.googleapis.com https://ai.google.dev; media-src 'self' data: blob:;"
+X-Frame-Options = "DENY"
+X-Content-Type-Options = "nosniff"
+X-XSS-Protection = "1; mode=block"
+Referrer-Policy = "strict-origin-when-cross-origin"
+Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+```
+
+**API Key Security Checklist:**
+- [ ] API key stored in environment variables only
+- [ ] Domain restrictions configured in Google Cloud Console
+- [ ] No secrets scanning bypass in netlify.toml
+- [ ] Environment detection implemented in application
+- [ ] User-friendly error messages for missing API keys
+- [ ] API key format validation during initialization
 
 ## 🎯 QUALITY GATES
 

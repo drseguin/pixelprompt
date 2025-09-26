@@ -130,25 +130,45 @@ netlify env:list
 
 ## Build Configuration
 
-### Netlify Build Settings
+### Secure Netlify Build Settings
 
-For optimal deployment, configure these build settings in Netlify:
+The new `netlify.toml` configuration provides enhanced security without bypassing Netlify's security scanning:
 
 ```toml
-# netlify.toml
+# netlify.toml - Secure Configuration
 [build]
   command = "npm run build"
   publish = "build"
+  timeout = 10
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+  GENERATE_SOURCEMAP = "false"
+  CI = "true"
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://generativelanguage.googleapis.com https://ai.google.dev; media-src 'self' data: blob:;"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 ```
+
+**Key Security Improvements:**
+- **No secrets scanning bypass**: Removed all security bypass configurations
+- **Content Security Policy**: Restricts allowed domains and prevents XSS
+- **Security Headers**: Comprehensive protection against common attacks
+- **Performance Optimizations**: Disabled source maps for production security
 
 ### Environment-Specific Configuration
 
@@ -160,22 +180,36 @@ The application automatically detects the deployment environment:
 
 ## Security Considerations
 
-### API Key Security
+### Enhanced API Key Security
 
 1. **Never Commit API Keys**:
    - Add `.env` to `.gitignore`
-   - Use Netlify's environment variable system
-   - Rotate keys regularly
+   - Use Netlify's environment variable system exclusively for deployment
+   - Rotate keys regularly and update in all environments
+   - Never include API keys in `netlify.toml` or any committed files
 
-2. **Environment Variable Naming**:
+2. **Environment Variable Security**:
    - Only `REACT_APP_*` prefixed variables are exposed to the browser
    - API keys with this prefix will be visible in the built application
    - This is acceptable for Google Gemini API keys as they're intended for client-side use
+   - **Important**: Remove any secrets scanning bypass configurations
 
-3. **Access Control**:
+3. **Domain-Based Access Control** (Recommended):
    - Configure API key restrictions in Google Cloud Console
    - Limit usage to specific domains (your Netlify domain)
    - Set up usage quotas and monitoring
+   - Enable request logging for security audit trails
+
+4. **Content Security Policy**:
+   - The new `netlify.toml` includes comprehensive CSP headers
+   - Restricts connections to only Google Gemini API endpoints
+   - Prevents XSS and other security vulnerabilities
+
+5. **Security Headers**:
+   - X-Frame-Options: DENY (prevents clickjacking)
+   - X-Content-Type-Options: nosniff (prevents MIME sniffing)
+   - X-XSS-Protection: enabled
+   - Referrer-Policy: strict-origin-when-cross-origin
 
 ### Domain Restrictions
 
