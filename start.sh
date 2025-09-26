@@ -31,6 +31,14 @@ if [ ! -f "uploads/.gitkeep" ]; then
     touch uploads/.gitkeep
 fi
 
+# Check if containers are already running
+if docker compose ps | grep -q "pixelprompt-app.*Up"; then
+    echo "🔄 Application is already running. Restarting..."
+    docker compose down
+    echo "⏳ Waiting for containers to stop..."
+    sleep 3
+fi
+
 # Start the application with Docker Compose
 echo "🔧 Building and starting containers..."
 docker compose up -d --build
