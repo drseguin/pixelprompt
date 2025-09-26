@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is **pixelprompt**, a simplified React application for testing Google's Gemini 2.5 Flash Image API (formerly called "Nano Banana") with image generation and editing capabilities:
+This is **pixelprompt**, a React application for testing Google's Gemini 2.5 Flash Image API (formerly called "Nano Banana") with image generation and editing capabilities:
 - Two-panel layout: prompt on left, image/upload on right
 - Direct file-to-image conversion (no server uploads required)
 - Google Gemini API integration for image generation and editing
 - Simple prompt-based image modification workflow
-- Docker containerization for easy deployment
-- Netlify-compatible deployment with environment variable configuration
+- Netlify-compatible deployment with secure environment variable configuration
 - Comprehensive prompt library management with save/load functionality
+- Local development optimized for security and reliability
 
 ## Architecture
 
