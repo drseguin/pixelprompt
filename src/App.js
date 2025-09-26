@@ -29,7 +29,6 @@ function App() {
   const [generatedImage, setGeneratedImage] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageHistory, setImageHistory] = useState([]);
-  const [apiKeyInput, setApiKeyInput] = useState('');
   const [isApiReady, setIsApiReady] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -49,11 +48,10 @@ function App() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        // First check for React environment variable (Netlify deployment)
+        // Check for React environment variable (Netlify deployment)
         const reactAppApiKey = process.env.REACT_APP_GEMINI_API_KEY;
         if (reactAppApiKey) {
-          setApiKeyInput(reactAppApiKey);
-          initializeApi(reactAppApiKey, true);
+          initializeApi(reactAppApiKey);
           return;
         }
 
@@ -65,9 +63,13 @@ function App() {
 
           // Check if API key is already configured
           if (settingsData.nanoBanana?.apiKey) {
-            setApiKeyInput(settingsData.nanoBanana.apiKey);
-            initializeApi(settingsData.nanoBanana.apiKey, false);
+            initializeApi(settingsData.nanoBanana.apiKey);
           }
+        }
+
+        // If no API key found anywhere, show error
+        if (!reactAppApiKey && (!response || !response.ok || !settingsData?.nanoBanana?.apiKey)) {
+          console.error('No API key found. Please set REACT_APP_GEMINI_API_KEY environment variable.');
         }
       } catch (error) {
         console.error('Failed to load settings:', error);
@@ -89,83 +91,26 @@ function App() {
   /**
    * Initialize Nano Banana API with API key
    * @param {string} apiKey - Google AI API key
-   * @param {boolean} fromEnvironment - Whether the key came from React environment variables
    */
-  const initializeApi = useCallback(async (apiKey, fromEnvironment = false) => {
+  const initializeApi = useCallback(async (apiKey) => {
     try {
       nanoBananaApi.initialize(apiKey);
       setIsApiReady(true);
       console.log('Nano Banana API ready');
-
-      // Only save to backend settings if not from environment variables
-      if (!fromEnvironment) {
-        await saveApiKeyToSettings(apiKey);
-      }
     } catch (error) {
       console.error('Failed to initialize API:', error);
       setIsApiReady(false);
-      alert('Failed to initialize Nano Banana API. Please check your API key.');
+      console.error('Failed to initialize Nano Banana API. Please check your API key configuration.');
     }
   }, []);
 
-  /**
-   * Save API key to .env file
-   * @param {string} apiKey - The API key to save
-   */
-  const saveApiKeyToSettings = async (apiKey) => {
-    try {
-      // Save API key to .env file via new endpoint
-      const response = await fetch('/api/env/apikey', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ apiKey }),
-      });
-
-      if (response.ok) {
-        console.log('API key saved to .env file');
-
-        // Update settings state to reflect the change (nanoBanana.apiKey will be populated from env)
-        const settingsResponse = await fetch('/api/settings');
-        if (settingsResponse.ok) {
-          const updatedSettings = await settingsResponse.json();
-          setSettings(updatedSettings);
-        }
-      } else {
-        const errorData = await response.json();
-        console.warn('Failed to save API key:', errorData.error);
-        throw new Error(errorData.error || 'Failed to save API key');
-      }
-    } catch (error) {
-      console.error('Error saving API key:', error);
-      throw error;
-    }
-  };
-
-  /**
-   * Handle API key input and initialization
-   * @param {Event} e - Input change event
-   */
-  const handleApiKeyChange = (e) => {
-    setApiKeyInput(e.target.value);
-  };
-
-  /**
-   * Save API key and initialize the service
-   */
-  const handleApiKeySubmit = async () => {
-    if (apiKeyInput.trim()) {
-      await initializeApi(apiKeyInput.trim(), false);
-    }
-  };
 
   /**
    * Generate or edit image based on current state
    */
   const handleGenerate = async () => {
     if (!isApiReady) {
-      alert('Please configure your API key first.');
+      alert('API key not configured. Please set REACT_APP_GEMINI_API_KEY environment variable.');
       return;
     }
 
@@ -485,30 +430,13 @@ function App() {
       <main className="app-main">
         {!isApiReady && (
           <div className="api-key-section">
-            <label htmlFor="api-key" className="api-key-label">
-              Google AI API Key:
-            </label>
-            <div className="api-key-input-group">
-              <input
-                id="api-key"
-                type="password"
-                className="api-key-input"
-                value={apiKeyInput}
-                onChange={handleApiKeyChange}
-                placeholder="Enter your Google AI API key"
-              />
-              <button
-                className="api-key-submit"
-                onClick={handleApiKeySubmit}
-                disabled={!apiKeyInput.trim()}
-                type="button"
-              >
-                Set Key
-              </button>
+            <div className="api-key-error">
+              <h3>API Key Not Configured</h3>
+              <p>Please set the <code>REACT_APP_GEMINI_API_KEY</code> environment variable.</p>
+              <p>
+                Get your API key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
+              </p>
             </div>
-            <p className="api-key-help">
-              Get your API key from <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>
-            </p>
           </div>
         )}
 
