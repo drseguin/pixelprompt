@@ -43,41 +43,17 @@ function App() {
   });
 
   /**
-   * Loads application settings and initializes API
+   * Initialize API with environment variable
    */
   useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        // Check for React environment variable (Netlify deployment)
-        const reactAppApiKey = process.env.REACT_APP_GEMINI_API_KEY;
-        if (reactAppApiKey) {
-          initializeApi(reactAppApiKey);
-          return;
-        }
-
-        // Fallback to backend API for local development
-        const response = await fetch('/api/settings');
-        if (response.ok) {
-          const settingsData = await response.json();
-          setSettings(settingsData);
-
-          // Check if API key is already configured
-          if (settingsData.nanoBanana?.apiKey) {
-            initializeApi(settingsData.nanoBanana.apiKey);
-          }
-        }
-
-        // If no API key found anywhere, show error
-        if (!reactAppApiKey && (!response || !response.ok || !settingsData?.nanoBanana?.apiKey)) {
-          console.error('No API key found. Please set REACT_APP_GEMINI_API_KEY environment variable.');
-        }
-      } catch (error) {
-        console.error('Failed to load settings:', error);
-      }
-    };
-
-    loadSettings();
-  }, []);
+    const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
+    if (apiKey) {
+      initializeApi(apiKey);
+    } else {
+      console.error('No API key found. Please set REACT_APP_GEMINI_API_KEY environment variable.');
+      setIsApiReady(false);
+    }
+  }, [initializeApi]);
 
 
   /**
