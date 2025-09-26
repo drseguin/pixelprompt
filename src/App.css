@@ -249,9 +249,10 @@
 
 .prompt-actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 16px;
+  align-items: stretch;
 }
 
 .generate-button {
@@ -269,6 +270,7 @@
   justify-content: center;
   display: flex;
   align-items: center;
+  flex-basis: 100%; /* Take full width of the row */
 }
 
 .generate-button:hover:not(:disabled) {
@@ -295,7 +297,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   justify-content: center;
   display: flex;
   align-items: center;
@@ -360,7 +363,8 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
 }
 
 .start-over-button-inline:hover {
@@ -473,10 +477,18 @@
     padding: 16px;
   }
 
-  .prompt-actions {
-    flex-direction: column;
-    gap: 8px;
-    align-items: stretch;
+  /* Keep flex-wrap on mobile but adjust flex-basis for generate button */
+  .generate-button {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  /* Secondary buttons can flow next to each other if there's space */
+  .prompt-actions .clear-prompt-button,
+  .prompt-actions .start-over-button-inline,
+  .prompt-actions .prompt-ideas-button {
+    flex-basis: calc(50% - 4px);
+    min-width: 120px;
   }
 
   .prompt-textarea {
@@ -1062,7 +1074,8 @@ textarea:focus-visible {
   justify-content: center;
   gap: 6px;
   white-space: nowrap;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
 }
 
 .prompt-ideas-button:hover {
